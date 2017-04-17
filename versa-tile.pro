@@ -44,3 +44,11 @@ sdl2
   QMAKE_CXXFLAGS += $$system(pkg-config --cflags sdl2 SDL2_image)
   LIBS           += $$system(pkg-config --libs sdl2 SDL2_image)
 }
+
+DISTFILES += \
+    data/close.png \
+    data/new-mesh.png \
+    data/new-tileset.png \
+    data/open.png \
+    data/save.png \
+    data/tilesets/croco.png

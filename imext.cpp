@@ -1,6 +1,7 @@
 #include "imext.h"
 #include "glstate.h"
 #include <stdarg.h>
+#include <memory>
 
 namespace ImGui
 {
@@ -43,13 +44,18 @@ namespace ImGui
         {
             auto backup = GLState::backup();
 
-            metainfo * info = (metainfo*)cmd->UserCallbackData;
+            std::unique_ptr<metainfo> info((metainfo*)cmd->UserCallbackData);
             int x,y,w,h;
 
             x = info->pos.x;
             y = info->pos.y;
             w = info->size.x;
             h = info->size.y;
+
+            if(x < 0 || y < 0 || w <= 0 || h <= 0)
+                return;
+
+            // FIX: When larger screen, everything breaks!
 
             // Setup viewport before scissor rect clipping
             glViewport(x, (int)(ImGui::GetIO().DisplaySize.y - y - h), w, h);
@@ -71,6 +77,9 @@ namespace ImGui
             if(y+h > cmd->ClipRect.w)
                 h = cmd->ClipRect.w - y;
 
+            if(x < 0 || y < 0 || w <= 0 || h <= 0)
+                return;
+
             glScissor(x, (int)(ImGui::GetIO().DisplaySize.y - y - h), w, h);
 
             // TODO: Do OpenGL rendering here
@@ -79,8 +88,6 @@ namespace ImGui
 
             // Restore the OpenGL state
             backup.restore();
-
-            delete info;
         }, info);
         ImGui::InvisibleButton("glwindow", info->size);
     }

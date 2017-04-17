@@ -128,6 +128,7 @@ int main(int, char**)
         glLinkProgram(shader);
     }
 
+    Texture tileset("data/tilesets/croco.png");
 
     // Main loop
     bool done = false;
@@ -170,8 +171,8 @@ int main(int, char**)
             {
 
             }
-            ImGui::End();
         }
+        ImGui::End();
 
         static bool aboutIsOpen = false;
         if(ImGui::BeginMainMenuBar())
@@ -191,26 +192,29 @@ int main(int, char**)
                 aboutIsOpen |= ImGui::MenuItem("About");
                 ImGui::EndMenu();
             }
-            ImGui::EndMainMenuBar();
         }
+        ImGui::EndMainMenuBar();
 
-        ImGui::SetNextWindowPosCenter(ImGuiSetCond_Appearing);
-        if(aboutIsOpen && ImGui::Begin("About Versa-Tile", &aboutIsOpen, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize))
+        if(aboutIsOpen)
         {
-            char const * aboutContents =
-R"raw(This editor provides a simple editing interface to
-create models based on a tile set.
+            ImGui::SetNextWindowPosCenter(ImGuiSetCond_Appearing);
+            if(ImGui::Begin("About Versa-Tile", &aboutIsOpen, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                char const * aboutContents =
+    R"raw(This editor provides a simple editing interface to
+    create models based on a tile set.
 
-Its UI is written with dear imgui, an immediate gui framework
-written by ocornut.
+    Its UI is written with dear imgui, an immediate gui framework
+    written by ocornut.
 
-The idea of this mode of model editing was inspired by
-Crocotile and a blender plugin that works similar.)raw";
-            ImGui::Text(aboutContents);
-            ImGui::Separator();
+    The idea of this mode of model editing was inspired by
+    Crocotile and a blender plugin that works similar.)raw";
+                ImGui::Text(aboutContents);
+                ImGui::Separator();
 
-            if (ImGui::Button("Close")) {
-                aboutIsOpen = false;
+                if (ImGui::Button("Close")) {
+                    aboutIsOpen = false;
+                }
             }
             ImGui::End();
         }
@@ -237,9 +241,57 @@ Crocotile and a blender plugin that works similar.)raw";
             }
 
             ImGui::Text("Good bye, rendering!");
-
-            ImGui::End();
         }
+        ImGui::End();
+
+        ImGui::SetNextWindowContentWidth(tileset.width() * 2);
+        ImGui::SetNextWindowSizeConstraints(
+            ImVec2(-1, -1),
+            ImVec2(-1, -1));
+        if(ImGui::Begin("Tile Set"))
+        {
+            auto pos = ImGui::GetCursorScreenPos();
+            auto draw = ImGui::GetWindowDrawList();
+
+            auto size = 2.0f * tileset.size();
+
+            ImGui::InvisibleButton("TileSet", size);
+
+            ImVec2 mouse_pos = ImVec2(
+                ImGui::GetIO().MousePos.x - pos.x,
+                ImGui::GetIO().MousePos.y - pos.y);
+
+            draw->AddImage(
+                tileset,
+                pos,
+                (glm::vec2)pos + size);
+            if(ImGui::IsItemHovered())
+            {
+                int tx = (int)(mouse_pos.x / 32);
+                int ty = (int)(mouse_pos.y / 32);
+
+                ImVec2 points[] =
+                {
+                    pos,
+                    (glm::vec2)pos + glm::vec2(32.0f, 0.0f),
+                    (glm::vec2)pos + glm::vec2(32.0f, 32.0f),
+                    (glm::vec2)pos + glm::vec2(0.0f, 32.0f),
+                };
+                for(int i = 0; i < 4; i++)
+                {
+                    points[i].x += 32 * tx;
+                    points[i].y += 32 * ty;
+                }
+                draw->AddPolyline(
+                    points,
+                    4,
+                    0xFF00FFFF,
+                    true,
+                    1.0f,
+                    true);
+            }
+        }
+        ImGui::End();
 
         if(ImGui::Begin("Mesh Editor##1"))
         {
@@ -247,8 +299,9 @@ Crocotile and a blender plugin that works similar.)raw";
             auto pos = ImGui::GetCursorScreenPos();
             ImGui::OpenGL(size, []()
             {
-                glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+                glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
+
                 glBindVertexArray(vao);
                 glUseProgram(shader);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -258,11 +311,10 @@ Crocotile and a blender plugin that works similar.)raw";
                 ImVec2 mouse_pos = ImVec2(
                     ImGui::GetIO().MousePos.x - pos.x,
                     ImGui::GetIO().MousePos.y - pos.y);
-
             }
 
-            ImGui::End();
         }
+        ImGui::End();
 
         // Rendering
         glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);

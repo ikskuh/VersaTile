@@ -4,6 +4,7 @@
 #include "imgui/imgui.h"
 #include <GL/gl3w.h>
 #include <SDL2/SDL.h>
+#include <glm/glm.hpp>
 
 class Texture
 {
@@ -30,7 +31,7 @@ public:
 
     uint height() const { return this->mHeight; }
 
-    ImVec2 size() const { return ImVec2(this->mWidth, this->mHeight); }
+    glm::vec2 size() const { return glm::vec2(this->mWidth, this->mHeight); }
 
     operator ImTextureID() const {
         return reinterpret_cast<ImTextureID>(this->mTex);

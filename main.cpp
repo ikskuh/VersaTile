@@ -17,6 +17,8 @@
 
 static void sysOpenGLDebug(GLenum,GLenum,GLuint,GLenum,GLsizei,const GLchar*,const void *);
 
+GLuint shader, vao;
+
 int main(int, char**)
 {
     // Setup SDL
@@ -53,6 +55,78 @@ int main(int, char**)
 
     // Setup ImGui binding
     ImGui_ImplSdlGL3_Init(window);
+
+
+    {
+        GLuint vertexBuffer;
+
+        float vertices[] =
+        {
+            -0.8f, -0.8f,
+             0.8f, -0.8f,
+             0.8f,  0.8f,
+        };
+
+        glGenBuffers(1, &vertexBuffer);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            sizeof vertices,
+            vertices,
+            GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        glEnableVertexAttribArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+
+        glVertexAttribPointer(
+            0,
+            2,
+            GL_FLOAT,
+            GL_FALSE,
+            2 * sizeof(float),
+            nullptr);
+
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        const GLchar *vertex_shader =
+            "#version 330\n"
+            "layout(location = 0) in vec2 Position;\n"
+            "out vec2 Frag_UV;\n"
+            "void main()\n"
+            "{\n"
+            "	Frag_UV = Position;\n"
+            "	gl_Position = vec4(Position.xy,0,1);\n"
+            "}\n";
+
+        const GLchar* fragment_shader =
+            "#version 330\n"
+            "in vec2 Frag_UV;\n"
+            "out vec4 Out_Color;\n"
+            "void main()\n"
+            "{\n"
+            "	Out_Color = vec4(fract(Frag_UV.xy), 0.0f, 1.0f);\n"
+            "}\n";
+
+        shader = glCreateProgram();
+        GLuint g_VertHandle = glCreateShader(GL_VERTEX_SHADER);
+        GLuint g_FragHandle = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(g_VertHandle, 1, &vertex_shader, 0);
+        glShaderSource(g_FragHandle, 1, &fragment_shader, 0);
+        glCompileShader(g_VertHandle);
+        glCompileShader(g_FragHandle);
+        glAttachShader(shader, g_VertHandle);
+        glAttachShader(shader, g_FragHandle);
+        glLinkProgram(shader);
+    }
 
 
     // Main loop
@@ -141,6 +215,80 @@ Crocotile and a blender plugin that works similar.)raw";
             ImGui::End();
         }
 
+        if(ImGui::Begin("Render Window"))
+        {
+            ImGui::Text("Hello, rendering!");
+
+            auto * list = ImGui::GetWindowDrawList();
+            struct {
+                ImVec2 pos;
+                ImVec2 size;
+            } info;
+            info.pos = ImGui::GetCursorScreenPos();
+            info.size = ImGui::GetContentRegionAvail(); // ImVec2(ImGui::GetContentRegionAvailWidth(), 100);
+            info.size.x = std::max(info.size.x, 400.0f);
+            info.size.y = std::max(info.size.y, 300.0f);
+
+            list->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd)
+            {
+                auto backup = GLState::backup();
+
+                auto i = (typeof info *)cmd->UserCallbackData;
+                int x,y,w,h;
+
+                x = i->pos.x;
+                y = i->pos.y;
+                w = i->size.x;
+                h = i->size.y;
+
+                // Setup viewport before scissor rect clipping
+                glViewport(x, (int)(ImGui::GetIO().DisplaySize.y - y - h), w, h);
+
+                // Getting the scissor rectangle right (clip against outer bounds)
+                if(x < cmd->ClipRect.x)
+                {
+                    w -= cmd->ClipRect.x - x;
+                    x = cmd->ClipRect.x;
+                }
+                if(y < cmd->ClipRect.y)
+                {
+                    h -= cmd->ClipRect.y - y;
+                    y = cmd->ClipRect.y;
+                }
+
+                if(x+w > cmd->ClipRect.z)
+                    w = cmd->ClipRect.z - x;
+                if(y+h > cmd->ClipRect.w)
+                    h = cmd->ClipRect.w - y;
+
+                glScissor(x, (int)(ImGui::GetIO().DisplaySize.y - y - h), w, h);
+                glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT);
+
+
+                // TODO: Do OpenGL rendering here
+                glBindVertexArray(vao);
+                glUseProgram(shader);
+                glDrawArrays(GL_TRIANGLES, 0, 3);
+
+
+                // Restore the OpenGL state
+                backup.restore();
+
+            }, &info);
+            ImGui::InvisibleButton("glwindow", info.size);
+            if(ImGui::IsItemHovered())
+            {
+                ImVec2 mouse_pos = ImVec2(
+                    ImGui::GetIO().MousePos.x - info.pos.x,
+                    ImGui::GetIO().MousePos.y - info.pos.y);
+                // syslog::message("hovered at (", mouse_pos.x, ",", mouse_pos.y, ")");
+            }
+
+            ImGui::Text("Good bye, rendering!");
+
+            ImGui::End();
+        }
 
         // Rendering
         glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);

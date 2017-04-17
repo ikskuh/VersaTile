@@ -15,7 +15,9 @@ SOURCES += main.cpp \
     mesheditor.cpp \
     texture.cpp \
     iconstorage.cpp \
-    syslog.cpp
+    syslog.cpp \
+    imext.cpp \
+    glstate.cpp
 
 INCLUDEPATH += $$PWD/imgui/
 
@@ -32,7 +34,8 @@ HEADERS += \
     texture.h \
     imext.h \
     iconstorage.h \
-    syslog.h
+    syslog.h \
+    glstate.h
 
 sdl2
 {

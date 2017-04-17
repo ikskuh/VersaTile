@@ -219,73 +219,47 @@ Crocotile and a blender plugin that works similar.)raw";
         {
             ImGui::Text("Hello, rendering!");
 
-            auto * list = ImGui::GetWindowDrawList();
-            struct {
-                ImVec2 pos;
-                ImVec2 size;
-            } info;
-            info.pos = ImGui::GetCursorScreenPos();
-            info.size = ImGui::GetContentRegionAvail(); // ImVec2(ImGui::GetContentRegionAvailWidth(), 100);
-            info.size.x = std::max(info.size.x, 400.0f);
-            info.size.y = std::max(info.size.y, 300.0f);
-
-            list->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd)
+            auto pos = ImGui::GetCursorScreenPos();
+            ImGui::OpenGL(ImVec2(200, 200), []()
             {
-                auto backup = GLState::backup();
-
-                auto i = (typeof info *)cmd->UserCallbackData;
-                int x,y,w,h;
-
-                x = i->pos.x;
-                y = i->pos.y;
-                w = i->size.x;
-                h = i->size.y;
-
-                // Setup viewport before scissor rect clipping
-                glViewport(x, (int)(ImGui::GetIO().DisplaySize.y - y - h), w, h);
-
-                // Getting the scissor rectangle right (clip against outer bounds)
-                if(x < cmd->ClipRect.x)
-                {
-                    w -= cmd->ClipRect.x - x;
-                    x = cmd->ClipRect.x;
-                }
-                if(y < cmd->ClipRect.y)
-                {
-                    h -= cmd->ClipRect.y - y;
-                    y = cmd->ClipRect.y;
-                }
-
-                if(x+w > cmd->ClipRect.z)
-                    w = cmd->ClipRect.z - x;
-                if(y+h > cmd->ClipRect.w)
-                    h = cmd->ClipRect.w - y;
-
-                glScissor(x, (int)(ImGui::GetIO().DisplaySize.y - y - h), w, h);
                 glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
-
-
-                // TODO: Do OpenGL rendering here
                 glBindVertexArray(vao);
                 glUseProgram(shader);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
-
-
-                // Restore the OpenGL state
-                backup.restore();
-
-            }, &info);
-            ImGui::InvisibleButton("glwindow", info.size);
+            });
             if(ImGui::IsItemHovered())
             {
                 ImVec2 mouse_pos = ImVec2(
-                    ImGui::GetIO().MousePos.x - info.pos.x,
-                    ImGui::GetIO().MousePos.y - info.pos.y);
-                // syslog::message("hovered at (", mouse_pos.x, ",", mouse_pos.y, ")");
+                    ImGui::GetIO().MousePos.x - pos.x,
+                    ImGui::GetIO().MousePos.y - pos.y);
+                syslog::message("hovered at (", mouse_pos.x, ",", mouse_pos.y, ")");
             }
 
             ImGui::Text("Good bye, rendering!");
+
+            ImGui::End();
+        }
+
+        if(ImGui::Begin("Mesh Editor##1"))
+        {
+            auto size = ImGui::GetContentRegionAvail();
+            auto pos = ImGui::GetCursorScreenPos();
+            ImGui::OpenGL(size, []()
+            {
+                glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT);
+                glBindVertexArray(vao);
+                glUseProgram(shader);
+                glDrawArrays(GL_TRIANGLES, 0, 3);
+            });
+            if(ImGui::IsItemHovered())
+            {
+                ImVec2 mouse_pos = ImVec2(
+                    ImGui::GetIO().MousePos.x - pos.x,
+                    ImGui::GetIO().MousePos.y - pos.y);
+
+            }
 
             ImGui::End();
         }

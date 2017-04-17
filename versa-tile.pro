@@ -2,9 +2,10 @@ TEMPLATE = app
 CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
-CONFIG += sdl2
+CONFIG += sdl2 sdl2_image
 
 include(/home/felix/projects/gl3w/gl3w.pri)
+include(/home/felix/projects/nativefiledialog/nativefiledialog.pri)
 
 SOURCES += main.cpp \
     imgui/imgui_draw.cpp \
@@ -25,7 +26,7 @@ HEADERS += \
 sdl2
 {
   message(Include SDL2)
-  QMAKE_CFLAGS   += `pkg-config --cflags sdl2`
-  QMAKE_CXXFLAGS += `pkg-config --cflags sdl2`
-  LIBS           += `pkg-config --libs sdl2`
+  QMAKE_CFLAGS   += $$system(pkg-config --cflags sdl2 SDL2_image)
+  QMAKE_CXXFLAGS += $$system(pkg-config --cflags sdl2 SDL2_image)
+  LIBS           += $$system(pkg-config --libs sdl2 SDL2_image)
 }

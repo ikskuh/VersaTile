@@ -9,6 +9,9 @@
 struct SDL_Window;
 typedef union SDL_Event SDL_Event;
 
+#include "imgui.h"
+#include <SDL2/SDL.h>
+
 IMGUI_API bool        ImGui_ImplSdlGL3_Init(SDL_Window* window);
 IMGUI_API void        ImGui_ImplSdlGL3_Shutdown();
 IMGUI_API void        ImGui_ImplSdlGL3_NewFrame(SDL_Window* window);

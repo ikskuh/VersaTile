@@ -9,141 +9,25 @@
 #include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <memory>
-#include <nfd.h>
+#include "system.h"
+#include "texture.h"
+#include "imext.h"
+#include "iconstorage.h"
+#include "syslog.h"
 
 static void sysOpenGLDebug(GLenum,GLenum,GLuint,GLenum,GLsizei,const GLchar*,const void *);
-
-class Texture
-{
-private:
-    GLuint mTex;
-    uint mWidth, mHeight;
-
-public:
-    Texture() : mTex(0), mWidth(0), mHeight(0)
-    {
-        glGenTextures(1, &this->mTex);
-    }
-
-    Texture(char const * fileName) : Texture()
-    {
-        this->load(fileName);
-    }
-
-    Texture(Texture &&other) = delete;
-
-    Texture(const Texture &other) = delete;
-
-    ~Texture()
-    {
-        glDeleteTextures(1, &this->mTex);
-        this->mTex = 0;
-    }
-
-    void load(char const * fileName)
-    {
-        if(fileName == nullptr) {
-            throw "Missing filename!";
-        }
-        std::unique_ptr<SDL_Surface, std::function<void (SDL_Surface*)>> surface(IMG_Load(fileName), SDL_FreeSurface);
-        if(surface == nullptr) {
-            throw IMG_GetError();
-        }
-        GLint last_texture;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-
-        std::cout << surface->w << ", " << surface->h << ", " << surface->pixels << std::endl;
-        GLenum format = GL_RGB;
-        if(surface->format->BytesPerPixel == 4)
-        {
-            if(surface->format->Rmask == 0xFF) {
-                format = GL_RGBA;
-            } else {
-                format = GL_BGRA;
-            }
-        }
-        else
-        {
-            if(surface->format->Rmask == 0xFF) {
-                format = GL_RGB;
-            } else {
-                format = GL_BGR;
-            }
-        }
-
-        glBindTexture(GL_TEXTURE_2D, this->mTex);
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RGBA,
-            surface->w, surface->h,
-            0,
-            format,
-            GL_UNSIGNED_BYTE,
-            surface->pixels);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glBindTexture(GL_TEXTURE_2D, last_texture);
-
-        this->mWidth = surface->w;
-        this->mHeight = surface->h;
-    }
-
-    GLuint id() const { return this->mTex; }
-
-    uint width() const { return this->mWidth; }
-
-    uint height() const { return this->mHeight; }
-
-    ImVec2 size() const { return ImVec2(this->mWidth, this->mHeight); }
-
-    operator ImTextureID() const {
-        return reinterpret_cast<ImTextureID>(this->mTex);
-    }
-};
-
-namespace ImGui
-{
-    static void TooltipText(char const * fmt, ...)
-    {
-        if(ImGui::IsItemHovered())
-        {
-            ImGui::BeginTooltip();
-            va_list args;
-            va_start(args, fmt);
-            ImGui::TextV(fmt, args);
-            va_end(args);
-            ImGui::EndTooltip();
-        }
-    }
-
-    static bool ToolbarButton(Texture const & image, char const * toolTip)
-    {
-        auto result = ImGui::ImageButton(image, image.size());
-        ImGui::TooltipText(toolTip);
-        ImGui::SameLine();
-        return result;
-    }
-}
 
 int main(int, char**)
 {
     // Setup SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
     {
-        printf("Error: %s\n", SDL_GetError());
+        syslog::error("Could not initialize SDL: ", SDL_GetError());
         return -1;
     }
     if(IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) == 0)
     {
-        std::cerr
-            << "[ERR] Could not initialize SDL2_image: "
-            << IMG_GetError()
-            << std::endl;
+        syslog::error("Could not initialize SDL2_image: ", IMG_GetError());
         return -1;
     }
 
@@ -164,12 +48,12 @@ int main(int, char**)
     glDebugMessageCallback(&sysOpenGLDebug, nullptr);
     glEnable(GL_DEBUG_OUTPUT);
 
+    // Initialize icons
+    Icons = new IconStorage;
+
     // Setup ImGui binding
     ImGui_ImplSdlGL3_Init(window);
 
-    Texture imgOpen("data/open.png");
-    Texture imgSave("data/save.png");
-    Texture imgClose("data/close.png");
 
     // Main loop
     bool done = false;
@@ -189,27 +73,6 @@ int main(int, char**)
         }
         ImGui_ImplSdlGL3_NewFrame(window);
 
-        if(ImGui::BeginMainMenuBar())
-        {
-            if(ImGui::BeginMenu("File"))
-            {
-                ImGui::MenuItem("Open");
-                ImGui::Separator();
-                if(ImGui::MenuItem("Quit"))
-                {
-                    done = true;
-                }
-                ImGui::EndMenu();
-            }
-            if (ImGui::BeginMenu("Examples"))
-            {
-                ImGui::MenuItem("Main menu bar");
-                ImGui::MenuItem("Console");
-                ImGui::EndMenu();
-            }
-            ImGui::EndMainMenuBar();
-        }
-
         float w = ImGui::GetIO().DisplaySize.x;
         ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f), ImGuiSetCond_Always);
         ImGui::SetNextWindowSizeConstraints(
@@ -224,33 +87,60 @@ int main(int, char**)
         if(ImGui::Begin("ToolBar", nullptr, style))
         {
             // Toolbar inserted here
-            if(ImGui::ToolbarButton(imgOpen, "Open file"))
-            {
-                nfdchar_t *path;
-                auto result = NFD_OpenDialog(nullptr, nullptr, &path);
-                switch(result)
-                {
-                    case NFD_OKAY:
-                        std::cout << "Open file: " << path << std::endl;
-                        break;
-                    case NFD_CANCEL:
-                        break;
-                    case NFD_ERROR:
-                        std::cerr << "[ERR] " << NFD_GetError() << std::endl;
-                        break;
-                }
-
-            }
-            if(ImGui::ToolbarButton(imgSave, "Save file"))
+            if(ImGui::ToolbarButton(Icons->Open, "Open file")) sys::openFile();
+            if(ImGui::ToolbarButton(Icons->Save, "Save file"))
             {
 
             }
-            if(ImGui::ToolbarButton(imgClose, "Close file"))
+            if(ImGui::ToolbarButton(Icons->Close, "Close file"))
             {
 
             }
             ImGui::End();
         }
+
+        static bool aboutIsOpen = false;
+        if(ImGui::BeginMainMenuBar())
+        {
+            if(ImGui::BeginMenu("File"))
+            {
+                if(ImGui::MenuItem("Open")) sys::openFile();
+                ImGui::Separator();
+                if(ImGui::MenuItem("Quit"))
+                {
+                    done = true;
+                }
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Help"))
+            {
+                aboutIsOpen |= ImGui::MenuItem("About");
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
+
+        ImGui::SetNextWindowPosCenter(ImGuiSetCond_Appearing);
+        if(aboutIsOpen && ImGui::Begin("About Versa-Tile", &aboutIsOpen, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            char const * aboutContents =
+R"raw(This editor provides a simple editing interface to
+create models based on a tile set.
+
+Its UI is written with dear imgui, an immediate gui framework
+written by ocornut.
+
+The idea of this mode of model editing was inspired by
+Crocotile and a blender plugin that works similar.)raw";
+            ImGui::Text(aboutContents);
+            ImGui::Separator();
+
+            if (ImGui::Button("Close")) {
+                aboutIsOpen = false;
+            }
+            ImGui::End();
+        }
+
 
         // Rendering
         glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
@@ -282,25 +172,24 @@ static void sysOpenGLDebug(
     const GLchar * message,
     const void *userParam)
 {
-    std::ostream &out = std::cerr;
+    std::string msg(message, length);
+
     switch(severity)
     {
         case GL_DEBUG_SEVERITY_HIGH:
-            out << "[ERROR] ";
+            syslog::error(msg);
             break;
         case GL_DEBUG_SEVERITY_MEDIUM:
-            out << "[ERROR] ";
+            syslog::error(msg);
             break;
         case GL_DEBUG_SEVERITY_LOW:
-            out << "[WARNING] ";
+            syslog::warning(msg);
             break;
         case GL_DEBUG_SEVERITY_NOTIFICATION:
-            out << "[MSG] ";
+            syslog::message(msg);
             break;
         default:
-            out << "[???] ";
+            syslog::message(msg);
             break;
     }
-    out << std::string(message, length);
-    out << std::endl;
 }

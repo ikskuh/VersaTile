@@ -10,7 +10,12 @@ include(/home/felix/projects/nativefiledialog/nativefiledialog.pri)
 SOURCES += main.cpp \
     imgui/imgui_draw.cpp \
     imgui/imgui.cpp \
-    imgui/imgui_impl_sdl_gl3.cpp
+    imgui/imgui_impl_sdl_gl3.cpp \
+    system.cpp \
+    mesheditor.cpp \
+    texture.cpp \
+    iconstorage.cpp \
+    syslog.cpp
 
 INCLUDEPATH += $$PWD/imgui/
 
@@ -21,7 +26,13 @@ HEADERS += \
     imgui/imgui_internal.h \
     imgui/stb_rect_pack.h \
     imgui/stb_textedit.h \
-    imgui/stb_truetype.h
+    imgui/stb_truetype.h \
+    imgui/system.h \
+    mesheditor.h \
+    texture.h \
+    imext.h \
+    iconstorage.h \
+    syslog.h
 
 sdl2
 {

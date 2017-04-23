@@ -1,26 +1,34 @@
 #include <nfd.h>
 #include <iostream>
-#include "system.h"
-#include "mesheditor.h"
 #include <libgen.h>
 #include <string.h>
 #include <vector>
 #include <memory>
 #include <cstddef>
+#include <fstream>
 
 #include "imgui.h"
 #include "imext.h"
+#include "syslog.h"
+#include "json.hpp"
+
+#include "system.h"
+#include "mesheditor.h"
+#include "tilesetviewer.h"
 
 namespace sys
 {
     static nfdchar_t * workingDirectory = nullptr;
-    static std::vector<std::unique_ptr<MeshEditor>> editors;
+    static std::vector<std::unique_ptr<EditorWindow>> editors;
     static std::shared_ptr<Texture> texture;
 
     GLuint shader, vao, vbuffer;
 
+    std::unique_ptr<Texture> pixel;
+
     void init()
     {
+        pixel = std::unique_ptr<Texture>(new Texture("data/pixel.png"));
         texture = std::make_shared<Texture>("data/tilesets/croco.png");
 
         glGenBuffers(1, &vbuffer);
@@ -78,13 +86,14 @@ R"glsl(#version 330
 in vec2 Frag_UV;
 out vec4 Out_Color;
 uniform sampler2D texDiffuse;
+uniform vec4 vecTint;
 void main()
 {
     ivec2 size = textureSize(texDiffuse, 0);
     vec2 uv = vec2(
         Frag_UV.x / float(size.x),
         Frag_UV.y / float(size.y));
-    Out_Color = texture(texDiffuse, uv);
+    Out_Color = vecTint * texture(texDiffuse, uv);
 })glsl";
 
         shader = glCreateProgram();
@@ -101,9 +110,15 @@ void main()
 
     void update()
     {
-        for(std::unique_ptr<MeshEditor> & edit : editors)
+        for(std::unique_ptr<EditorWindow> & edit : editors)
         {
-            std::string name("Mesh Editor##");
+            std::string name("Unknown Editor##");
+            if(dynamic_cast<MeshEditor*>(edit.get())) {
+                name = "Mesh Editor##";
+            }
+            else if(dynamic_cast<TilesetViewer*>(edit.get())) {
+                name = "Tile Set##";
+            }
             name += std::to_string((uintptr_t)edit.get());
             edit->update(name);
         }
@@ -116,10 +131,10 @@ void main()
         editor->mesh().push_back(Face
         {
             {
-                Vertex(glm::ivec3(-1,  0, -1), glm::ivec2(208+0, 80+ 0)),
-                Vertex(glm::ivec3( 1,  0, -1), glm::ivec2(208+32,80+ 0)),
-                Vertex(glm::ivec3(-1,  0,  1), glm::ivec2(208+0, 80+32)),
-                Vertex(glm::ivec3( 1,  0,  1), glm::ivec2(208+32,80+32)),
+                Vertex(glm::ivec3( 0,  0,  0), glm::ivec2(208+0, 80+ 0)),
+                Vertex(glm::ivec3(32,  0,  0), glm::ivec2(208+32,80+ 0)),
+                Vertex(glm::ivec3( 0, 32,  0), glm::ivec2(208+0, 80+32)),
+                Vertex(glm::ivec3(32, 32,  0), glm::ivec2(208+32,80+32)),
             }
         });
 
@@ -128,8 +143,9 @@ void main()
 
     void openFile()
     {
-        nfdchar_t *path;
-        auto result = NFD_OpenDialog(nullptr, workingDirectory, &path);
+        nfdchar_t * path;
+        nfdchar_t const * filters = "json";
+        auto result = NFD_OpenDialog(filters, workingDirectory, &path);
         switch(result)
         {
             case NFD_OKAY:
@@ -153,7 +169,40 @@ void main()
 
     void openFile(char const * fileName)
     {
+        using namespace nlohmann;
         std::cout << "Open file '" << fileName << "'" << std::endl;
-        editors.emplace_back(new MeshEditor(texture));
+
+        std::ifstream input(fileName);
+        if(!input.is_open()) {
+            syslog::error("Failed to open file '", fileName, "': Not found.");
+            return;
+        }
+
+        json file;
+        try {
+            input >> file;
+        }
+        catch(...) {
+            syslog::error("Failed to open file '", fileName, "': Not json");
+            return;
+        }
+
+        if(file["versatile"].is_null() || !file["versatile"]) {
+            syslog::error("Failed to open file '", fileName, "': File not versatile *hrhr*");
+            return;
+        }
+
+        if(file["type"] == "tileset")
+        {
+            editors.emplace_back(new TilesetViewer(texture));
+        }
+        else if(file["type"] == "model")
+        {
+            editors.emplace_back(new MeshEditor(texture));
+        }
+        else
+        {
+            syslog::error("Failed to open file '", fileName, "': Not supported.");
+        }
     }
 }

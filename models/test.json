@@ -1,0 +1,23 @@
+{
+	"versatile": true,
+	"type": "model",
+	"tileset": "../data/tilesets/croco.json",
+	"faces": [
+		{
+			"pos": [0, 0, 0],
+			"uv": [208, 80]
+		},
+		{
+			"pos": [32, 0, 0],
+			"uv": [240, 80]
+		},
+		{
+			"pos": [0, 32, 0],
+			"uv": [208, 112]
+		},
+		{
+			"pos": [32, 32, 0],
+			"uv": [240, 112]
+		}
+	]
+}

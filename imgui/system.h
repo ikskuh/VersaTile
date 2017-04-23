@@ -2,6 +2,8 @@
 #define SYSTEM_H
 
 #include <GL/gl3w.h>
+#include <memory>
+#include "texture.h"
 
 namespace sys
 {
@@ -34,6 +36,8 @@ namespace sys
 
 
     extern GLuint shader, vao, vbuffer;
+
+    extern std::unique_ptr<Texture> pixel;
 }
 
 #endif // SYSTEM_H

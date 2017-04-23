@@ -1,12 +1,13 @@
 #ifndef MESHEDITOR_H
 #define MESHEDITOR_H
 
+#include "editorwindow.h"
 #include "mesh.h"
 #include "texture.h"
 #include <string>
 #include <memory>
 
-class MeshEditor
+class MeshEditor : public EditorWindow
 {
 private:
     Mesh mMesh;
@@ -16,7 +17,7 @@ private:
 public:
     explicit MeshEditor(std::shared_ptr<Texture> const & texture);
 
-    void update(std::string const & name);
+    void update(std::string const & name) override;
 
     Mesh & mesh() { return this->mMesh; }
 };

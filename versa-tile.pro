@@ -18,9 +18,12 @@ SOURCES += main.cpp \
     syslog.cpp \
     imext.cpp \
     glstate.cpp \
-    mesh.cpp
+    mesh.cpp \
+    tilesetviewer.cpp \
+    editorwindow.cpp
 
 INCLUDEPATH += $$PWD/imgui/
+INCLUDEPATH += $$PWD/../json/src/
 
 HEADERS += \
     imgui/imconfig.h \
@@ -37,7 +40,9 @@ HEADERS += \
     iconstorage.h \
     syslog.h \
     glstate.h \
-    mesh.h
+    mesh.h \
+    tilesetviewer.h \
+    editorwindow.h
 
 sdl2
 {

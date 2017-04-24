@@ -1,22 +1,22 @@
 #ifndef TILESETVIEWER_H
 #define TILESETVIEWER_H
 
-#include "texture.h"
-#include "editorwindow.h"
-#include <memory>
-#include <string>
+#include <QWidget>
 
-class TilesetViewer : public EditorWindow
+class TileSetViewer : public QWidget
 {
-private:
-    std::shared_ptr<Texture> mTileset;
-    int mTileSize;
+    Q_OBJECT
 public:
-    TilesetViewer(std::shared_ptr<Texture> const & tileset);
+    explicit TileSetViewer(QWidget *parent = 0);
 
-    void update(std::string const & name) override;
+    virtual QSize sizeHint() const override;
 
-    std::shared_ptr<Texture> const & tileset() const { return this->mTileset; }
+    virtual QSize minimumSizeHint() const override;
+
+    virtual void paintEvent(QPaintEvent *event) override;
+signals:
+
+public slots:
 };
 
 #endif // TILESETVIEWER_H

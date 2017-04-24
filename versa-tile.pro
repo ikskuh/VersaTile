@@ -1,61 +1,40 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2017-04-24T21:05:26
+#
+#-------------------------------------------------
+
+QT       += core gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = versa-tile
 TEMPLATE = app
-CONFIG += console c++11
-CONFIG -= app_bundle
-CONFIG -= qt
-CONFIG += sdl2 sdl2_image
 
-include(/home/felix/projects/gl3w/gl3w.pri)
-include(/home/felix/projects/nativefiledialog/nativefiledialog.pri)
+# The following define makes your compiler emit warnings if you use
+# any feature of Qt which as been marked as deprecated (the exact warnings
+# depend on your compiler). Please consult the documentation of the
+# deprecated API in order to know how to port your code away from it.
+DEFINES += QT_DEPRECATED_WARNINGS
 
-SOURCES += main.cpp \
-    imgui/imgui_draw.cpp \
-    imgui/imgui.cpp \
-    imgui/imgui_impl_sdl_gl3.cpp \
-    system.cpp \
-    mesheditor.cpp \
-    texture.cpp \
-    iconstorage.cpp \
-    syslog.cpp \
-    imext.cpp \
-    glstate.cpp \
-    mesh.cpp \
+# You can also make your code fail to compile if you use deprecated APIs.
+# In order to do so, uncomment the following line.
+# You can also select to disable deprecated APIs only up to a certain version of Qt.
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+
+
+SOURCES += main.cpp\
+        mainwindow.cpp \
+    modeleditorview.cpp \
     tilesetviewer.cpp \
-    editorwindow.cpp
+    mesh.cpp
 
-INCLUDEPATH += $$PWD/imgui/
-INCLUDEPATH += $$PWD/../json/src/
-
-HEADERS += \
-    imgui/imconfig.h \
-    imgui/imgui.h \
-    imgui/imgui_impl_sdl_gl3.h \
-    imgui/imgui_internal.h \
-    imgui/stb_rect_pack.h \
-    imgui/stb_textedit.h \
-    imgui/stb_truetype.h \
-    imgui/system.h \
-    mesheditor.h \
-    texture.h \
-    imext.h \
-    iconstorage.h \
-    syslog.h \
-    glstate.h \
-    mesh.h \
+HEADERS  += mainwindow.h \
+    modeleditorview.h \
     tilesetviewer.h \
-    editorwindow.h
+    mesh.h
 
-sdl2
-{
-  message(Include SDL2)
-  QMAKE_CFLAGS   += $$system(pkg-config --cflags sdl2 SDL2_image)
-  QMAKE_CXXFLAGS += $$system(pkg-config --cflags sdl2 SDL2_image)
-  LIBS           += $$system(pkg-config --libs sdl2 SDL2_image)
-}
+FORMS    += mainwindow.ui
 
-DISTFILES += \
-    data/close.png \
-    data/new-mesh.png \
-    data/new-tileset.png \
-    data/open.png \
-    data/save.png \
-    data/tilesets/croco.png
+RESOURCES += \
+    data.qrc

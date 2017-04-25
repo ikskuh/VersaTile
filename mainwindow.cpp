@@ -35,3 +35,18 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_actionPlane_Ground_XZ_triggered()
+{
+    this->mve->setPlaneAxis(1);
+}
+
+void MainWindow::on_actionPlane_Front_XY_triggered()
+{
+    this->mve->setPlaneAxis(2);
+}
+
+void MainWindow::on_actionPlane_Side_YZ_triggered()
+{
+    this->mve->setPlaneAxis(0);
+}

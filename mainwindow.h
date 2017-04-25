@@ -17,6 +17,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void on_actionPlane_Ground_XZ_triggered();
+
+    void on_actionPlane_Front_XY_triggered();
+
+    void on_actionPlane_Side_YZ_triggered();
+
 private:
     Ui::MainWindow *ui;
     ModelEditorView *mve;

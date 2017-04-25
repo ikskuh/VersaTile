@@ -34,6 +34,8 @@ public slots:
 
 private:
     QImage mTexture;
+    QRect mSelection;
+    QRect mStartSelection;
 };
 
 #endif // TILESETVIEWER_H

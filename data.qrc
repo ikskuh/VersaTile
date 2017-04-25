@@ -1,13 +1,12 @@
 <RCC>
     <qresource prefix="/">
-        <file>data/tilesets/croco.png</file>
-        <file>data/close.png</file>
-        <file>data/new-mesh.png</file>
-        <file>data/new-tileset.png</file>
-        <file>data/open.png</file>
-        <file>data/pixel.png</file>
-        <file>data/save.png</file>
-        <file>glsl/vertex.glsl</file>
-        <file>glsl/fragment.glsl</file>
-    </qresource>
+		    <file>data/tilesets/croco.png</file>
+				<file>data/close.png</file>
+				<file>data/new.png</file>
+				<file>data/open.png</file>
+				<file>data/pixel.png</file>
+				<file>data/save.png</file>
+				<file>glsl/vertex.glsl</file>
+				<file>glsl/fragment.glsl</file>
+			</qresource>
 </RCC>

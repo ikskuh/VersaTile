@@ -107,7 +107,7 @@
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Tile Set</string>
+    <string>T&amp;ile Set</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -168,10 +168,10 @@
   <action name="actionNew">
    <property name="icon">
     <iconset resource="data.qrc">
-     <normaloff>:/data/new-mesh.png</normaloff>:/data/new-mesh.png</iconset>
+     <normaloff>:/data/new.png</normaloff>:/data/new.png</iconset>
    </property>
    <property name="text">
-    <string>New</string>
+    <string>&amp;New</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -183,7 +183,7 @@
      <normaloff>:/data/open.png</normaloff>:/data/open.png</iconset>
    </property>
    <property name="text">
-    <string>Open...</string>
+    <string>&amp;Open...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -195,7 +195,7 @@
      <normaloff>:/data/save.png</normaloff>:/data/save.png</iconset>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -203,7 +203,7 @@
   </action>
   <action name="actionSave_As">
    <property name="text">
-    <string>Save As...</string>
+    <string>Sa&amp;ve As...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -211,17 +211,17 @@
   </action>
   <action name="actionOptions">
    <property name="text">
-    <string>Preferences</string>
+    <string>&amp;Preferences</string>
    </property>
   </action>
   <action name="actionQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
   </action>
   <action name="actionCopy">
    <property name="text">
-    <string>Copy</string>
+    <string>C&amp;opy</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -229,7 +229,7 @@
   </action>
   <action name="actionCut">
    <property name="text">
-    <string>Cut</string>
+    <string>&amp;Cut</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+X</string>
@@ -237,7 +237,7 @@
   </action>
   <action name="actionPaste">
    <property name="text">
-    <string>Paste</string>
+    <string>&amp;Paste</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
@@ -245,7 +245,7 @@
   </action>
   <action name="actionSelect_All">
    <property name="text">
-    <string>Select All</string>
+    <string>&amp;Select All</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
@@ -253,7 +253,7 @@
   </action>
   <action name="actionUnselect">
    <property name="text">
-    <string>Select Nothing</string>
+    <string>Select &amp;Nothing</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+A</string>
@@ -261,7 +261,7 @@
   </action>
   <action name="actionHome">
    <property name="text">
-    <string>Home</string>
+    <string>&amp;Home</string>
    </property>
    <property name="shortcut">
     <string>H</string>
@@ -269,7 +269,7 @@
   </action>
   <action name="actionSet_Home">
    <property name="text">
-    <string>Set Home</string>
+    <string>S&amp;et Home</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+H</string>
@@ -277,27 +277,27 @@
   </action>
   <action name="actionDefault">
    <property name="text">
-    <string>Default</string>
+    <string>&amp;Default</string>
    </property>
   </action>
   <action name="actionTop">
    <property name="text">
-    <string>Top</string>
+    <string>&amp;Top</string>
    </property>
   </action>
   <action name="actionSide">
    <property name="text">
-    <string>Side</string>
+    <string>&amp;Side</string>
    </property>
   </action>
   <action name="actionFront">
    <property name="text">
-    <string>Front</string>
+    <string>&amp;Front</string>
    </property>
   </action>
   <action name="actionSelect">
    <property name="text">
-    <string>Select</string>
+    <string>&amp;Select</string>
    </property>
    <property name="shortcut">
     <string>1</string>
@@ -305,7 +305,7 @@
   </action>
   <action name="actionRotate">
    <property name="text">
-    <string>Rotate</string>
+    <string>&amp;Rotate</string>
    </property>
    <property name="shortcut">
     <string>3</string>
@@ -313,7 +313,7 @@
   </action>
   <action name="actionFlip">
    <property name="text">
-    <string>Flip</string>
+    <string>&amp;Flip</string>
    </property>
    <property name="shortcut">
     <string>4</string>
@@ -321,7 +321,7 @@
   </action>
   <action name="actionMove">
    <property name="text">
-    <string>Move</string>
+    <string>&amp;Move</string>
    </property>
    <property name="shortcut">
     <string>2</string>
@@ -329,7 +329,7 @@
   </action>
   <action name="actionPlane_Ground_XZ">
    <property name="text">
-    <string>Plane Ground (XZ)</string>
+    <string>&amp;Plane Ground (XZ)</string>
    </property>
    <property name="shortcut">
     <string>Q</string>
@@ -337,7 +337,7 @@
   </action>
   <action name="actionPlane_Front_XY">
    <property name="text">
-    <string>Plane Front (XY)</string>
+    <string>Plane Front (&amp;XY)</string>
    </property>
    <property name="shortcut">
     <string>E</string>
@@ -345,7 +345,7 @@
   </action>
   <action name="actionPlane_Side_YZ">
    <property name="text">
-    <string>Plane Side (YZ)</string>
+    <string>Plane Side (&amp;YZ)</string>
    </property>
    <property name="shortcut">
     <string>R</string>

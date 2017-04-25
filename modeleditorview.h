@@ -58,6 +58,9 @@ public:
 
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
+private:
+    void getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent);
+
 signals:
 
 public slots:

@@ -45,15 +45,64 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
     fmt.setVersion(3, 3);
     this->setFormat(fmt);
     this->setMouseTracking(true);
+    this->grabKeyboard();
 
     this->mSpriteToInsert = QRect(32, 32, 48, 32);
 }
 
+void ModelEditorView::getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent)
+{
+    using namespace glm;
+    switch(this->mPlaneAxis)
+    {
+        case 0:
+            normal    = ivec3(1, 0, 0);
+            tangent   = ivec3(0, 0, 1);
+            cotangent = ivec3(0, 1, 0);
+            break;
+        case 1:
+            normal    = ivec3(0, 1, 0);
+            tangent   = ivec3(1, 0, 0);
+            cotangent = ivec3(0, 0, 1);
+            break;
+        case 2:
+            normal    = ivec3(0, 0, 1);
+            tangent   = ivec3(1, 0, 0);
+            cotangent = ivec3(0, 1, 0);
+            break;
+    }
+}
+
 void ModelEditorView::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Shift) {
-        this->mSnapToCoarseGrid = false;
+    glm::ivec3 normal, tangent, cotangent;
+    this->getPlane(normal, tangent, cotangent);
+
+    int stepSize = 1;
+    if(this->mSnapToCoarseGrid) {
+        stepSize = 16;
     }
+
+    switch(event->key())
+    {
+        case Qt::Key_W:
+            this->mCameraFocus += stepSize * normal;
+            break;
+        case Qt::Key_S:
+            this->mCameraFocus -= stepSize * normal;
+            break;
+        case Qt::Key_A:
+            this->mCameraFocus += stepSize * tangent;
+            break;
+        case Qt::Key_D:
+            this->mCameraFocus -= stepSize * tangent;
+            break;
+        case Qt::Key_Shift:
+            this->mSnapToCoarseGrid = false;
+            break;
+    }
+
+    this->repaint();
 }
 
 void ModelEditorView::keyReleaseEvent(QKeyEvent *event)
@@ -120,21 +169,18 @@ glm::ivec3 ModelEditorView::raycastAgainstPlane(int x, int y) const
 
     float dist = glm::dot(p0 - l0, n) / glm::dot(l, n);
 
-    return glm::ivec3(l0 + dist * l);
+    return glm::ivec3(l0 + dist * l + 0.5f);
 }
 
 void ModelEditorView::mousePressEvent(QMouseEvent *event)
 {
     mLastMouse = event->pos();
 
+    glm::ivec3 normal, tangent, cotangent;
+    this->getPlane(normal, tangent, cotangent);
+
     if(event->button() == Qt::LeftButton)
     {
-        const int gridSize = 1;
-        glm::ivec3 normal, tangent, cotangent;
-        normal[(this->mPlaneAxis +    0) % 3] = gridSize;
-        tangent[(this->mPlaneAxis +   1) % 3] = gridSize;
-        cotangent[(this->mPlaneAxis + 2) % 3] = gridSize;
-
         Face face;
         face.vertices[0] = Vertex(
             this->mCursorPosition,
@@ -287,8 +333,6 @@ void ModelEditorView::paintGL()
         sin(this->mTilt),
         cos(this->mPan) * cos(this->mTilt));
 
-    this->mCameraFocus = glm::ivec3(0, 0, 0);
-
     this->mCameraPosition = glm::vec3(this->mCameraFocus) - this->mZoom * cameraOffset;
 
     auto matProj = glm::perspectiveFov(
@@ -326,6 +370,9 @@ void ModelEditorView::paintGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
+    glm::ivec3 normal, tangent, cotangent;
+    this->getPlane(normal, tangent, cotangent);
+
     { // Render a ground plane
         glDepthMask(GL_TRUE);
         this->mPixel->bind();
@@ -354,22 +401,16 @@ void ModelEditorView::paintGL()
         glDepthMask(GL_TRUE);
         this->mPixel->bind();
 
-        const int gridSize = 16;
-        glm::ivec3 normal, tangent, cotangent;
-        normal[(this->mPlaneAxis +    0) % 3] = gridSize;
-        tangent[(this->mPlaneAxis +   1) % 3] = gridSize;
-        cotangent[(this->mPlaneAxis + 2) % 3] = gridSize;
-
         vertices.clear();
         for(int u = -10; u <= 10; u++)
         {
             for(int v = -10; v <= 10; v++)
             {
-                vertices.emplace_back(u * tangent + v * cotangent);
-                vertices.emplace_back(u * tangent - v * cotangent);
+                vertices.emplace_back(this->mCameraFocus + 16 * u * tangent + 16 * v * cotangent);
+                vertices.emplace_back(this->mCameraFocus + 16 * u * tangent - 16 * v * cotangent);
 
-                vertices.emplace_back(u * cotangent + v * tangent);
-                vertices.emplace_back(u * cotangent - v * tangent);
+                vertices.emplace_back(this->mCameraFocus + 16 * u * cotangent + 16 * v * tangent);
+                vertices.emplace_back(this->mCameraFocus + 16 * u * cotangent - 16 * v * tangent);
             }
         }
 
@@ -407,12 +448,6 @@ void ModelEditorView::paintGL()
 
         if(this->mSpriteToInsert.width() > 0)
         { // The last sprite is the currently inserted sprite.
-
-            const int gridSize = 1;
-            glm::ivec3 normal, tangent, cotangent;
-            normal[(this->mPlaneAxis +    0) % 3] = gridSize;
-            tangent[(this->mPlaneAxis +   1) % 3] = gridSize;
-            cotangent[(this->mPlaneAxis + 2) % 3] = gridSize;
 
             Vertex face[] =
             {

@@ -332,7 +332,7 @@
     <string>&amp;Plane Ground (XZ)</string>
    </property>
    <property name="shortcut">
-    <string>Q</string>
+    <string>R</string>
    </property>
   </action>
   <action name="actionPlane_Front_XY">
@@ -340,7 +340,7 @@
     <string>Plane Front (&amp;XY)</string>
    </property>
    <property name="shortcut">
-    <string>E</string>
+    <string>Q</string>
    </property>
   </action>
   <action name="actionPlane_Side_YZ">
@@ -348,7 +348,7 @@
     <string>Plane Side (&amp;YZ)</string>
    </property>
    <property name="shortcut">
-    <string>R</string>
+    <string>E</string>
    </property>
   </action>
  </widget>

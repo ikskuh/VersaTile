@@ -52,6 +52,14 @@ private slots:
 
     void on_mve_modelHasChanged();
 
+    void on_actionRotateRight_triggered();
+
+    void on_actionRotateLeft_triggered();
+
+    void on_actionFlip_Horizontal_triggered();
+
+    void on_actionFlip_Vertical_triggered();
+
 private:
     Ui::MainWindow *ui;
     ModelEditorView *mve;

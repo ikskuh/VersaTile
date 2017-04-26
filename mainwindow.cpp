@@ -169,3 +169,23 @@ void MainWindow::setModel(const Mesh & mesh)
     this->tse->setTexture(mesh.texture);
     this->mModelIsDirty = false;
 }
+
+void MainWindow::on_actionRotateRight_triggered()
+{
+    this->mve->rotateRight();
+}
+
+void MainWindow::on_actionRotateLeft_triggered()
+{
+    this->mve->rotateLeft();
+}
+
+void MainWindow::on_actionFlip_Horizontal_triggered()
+{
+    this->mve->flipHorizontal();
+}
+
+void MainWindow::on_actionFlip_Vertical_triggered()
+{
+    this->mve->flipVertical();
+}

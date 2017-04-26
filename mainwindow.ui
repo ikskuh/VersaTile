@@ -53,8 +53,10 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
     <addaction name="separator"/>
-    <addaction name="actionSelect_All"/>
-    <addaction name="actionUnselect"/>
+    <addaction name="actionFlip_Horizontal"/>
+    <addaction name="actionFlip_Vertical"/>
+    <addaction name="actionRotateRight"/>
+    <addaction name="actionRotateLeft"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -70,14 +72,11 @@
    </widget>
    <widget class="QMenu" name="menuMode">
     <property name="title">
-     <string>&amp;Mode</string>
+     <string>Tool</string>
     </property>
     <addaction name="actionSelect"/>
     <addaction name="actionMove"/>
     <addaction name="actionFlip"/>
-    <addaction name="separator"/>
-    <addaction name="actionRotateRight"/>
-    <addaction name="actionRotateLeft"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -130,6 +129,9 @@
    <addaction name="separator"/>
    <addaction name="actionRotateLeft"/>
    <addaction name="actionRotateRight"/>
+   <addaction name="separator"/>
+   <addaction name="actionFlip_Horizontal"/>
+   <addaction name="actionFlip_Vertical"/>
   </widget>
   <widget class="QToolBar" name="toolBar_3">
    <property name="windowTitle">
@@ -225,22 +227,6 @@
     <string>Ctrl+V</string>
    </property>
   </action>
-  <action name="actionSelect_All">
-   <property name="text">
-    <string>&amp;Select All</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+A</string>
-   </property>
-  </action>
-  <action name="actionUnselect">
-   <property name="text">
-    <string>Select &amp;Nothing</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+A</string>
-   </property>
-  </action>
   <action name="actionHome">
    <property name="icon">
     <iconset resource="data.qrc">
@@ -248,9 +234,6 @@
    </property>
    <property name="text">
     <string>&amp;Home</string>
-   </property>
-   <property name="shortcut">
-    <string>H</string>
    </property>
   </action>
   <action name="actionSet_Home">
@@ -296,7 +279,7 @@
      <normaloff>:/data/rotate-left.png</normaloff>:/data/rotate-left.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Rotate Left</string>
+    <string>Rotate &amp;Left</string>
    </property>
    <property name="shortcut">
     <string>Shift+R</string>
@@ -347,6 +330,36 @@
    </property>
    <property name="shortcut">
     <string>R</string>
+   </property>
+  </action>
+  <action name="actionFlip_Horizontal">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/flip-horizontal.png</normaloff>:/data/flip-horizontal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flip Horizontal</string>
+   </property>
+   <property name="toolTip">
+    <string>Flip Horizontal</string>
+   </property>
+   <property name="shortcut">
+    <string>H</string>
+   </property>
+  </action>
+  <action name="actionFlip_Vertical">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/flip-vertical.png</normaloff>:/data/flip-vertical.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flip Vertical</string>
+   </property>
+   <property name="toolTip">
+    <string>Flip Vertical</string>
+   </property>
+   <property name="shortcut">
+    <string>V</string>
    </property>
   </action>
  </widget>

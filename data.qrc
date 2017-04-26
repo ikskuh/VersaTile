@@ -15,5 +15,7 @@
         <file>data/tool-flip.png</file>
         <file>data/tool-move.png</file>
         <file>data/tool-select.png</file>
+        <file>data/flip-vertical.png</file>
+        <file>data/flip-horizontal.png</file>
     </qresource>
 </RCC>

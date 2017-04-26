@@ -39,7 +39,10 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
     mPan(0.0f), mTilt(0.0f), mZoom(128.0f),
     mCameraPosition(), mCameraFocus(), matViewProj(),
     mPlaneAxis(2),
-    mSnapToCoarseGrid(true)
+    mSpriteToInsert(), mSpriteToInsertRotation(0), mSpriteToInsertFlipping(None),
+    mSnapToCoarseGrid(true),
+    mUndoStack(),
+    mSelectedFace(-1)
 {
     QSurfaceFormat fmt;
     fmt.setVersion(3, 3);
@@ -135,6 +138,8 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
         stepSize = 16;
     }
 
+    event->setAccepted(true);
+
     switch(event->key())
     {
         case Qt::Key_W:
@@ -156,12 +161,15 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
             this->mCameraFocus.y -= stepSize;
             break;
         case Qt::Key_Space:
-            // Right button cancels sprite creation
-            this->mSpriteToInsert = QRect(); // We inserted, kill (maybe)
+            // Right button resets the tool to selection
+            this->mCurrentTool = Select;
             break;
         case Qt::Key_Shift:
             this->mSnapToCoarseGrid = false;
             break;
+        default:
+            event->setAccepted(false);
+            return;
     }
 
     this->repaint();
@@ -172,6 +180,19 @@ void ModelEditorView::keyReleaseEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_Shift) {
         this->mSnapToCoarseGrid = true;
     }
+}
+
+static int floor0(double value)
+{
+    // if (value > 0.0)
+    //     return ceil( value );
+    // else
+        return floor( value );
+}
+
+static glm::ivec3 floor0(glm::vec3 pos)
+{
+    return glm::ivec3(floor0(pos.x), floor0(pos.y), floor0(pos.z));
 }
 
 void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
@@ -206,7 +227,7 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
         this->mCursorPosition = this->raycastAgainstPlane(event->x(), event->y());
         if(this->mSnapToCoarseGrid)
         {
-            this->mCursorPosition = 16 * (this->mCursorPosition / 16);
+            this->mCursorPosition = 16 * floor0(glm::vec3(this->mCursorPosition) / 16.0f);
         }
     }
     this->repaint();
@@ -246,14 +267,6 @@ glm::ivec3 ModelEditorView::raycastAgainstPlane(int x, int y) const
     pos = glm::vec3(this->mCameraFocus * this->planeNormal())
             + glm::vec3(1 - this->planeNormal()) * pos;
 
-    auto floor0 = [](double value)
-    {
-        if (value < 0.0)
-            return ceil( value );
-        else
-            return floor( value );
-    };
-
     glm::ivec3 result(
         floor0(pos.x),
         floor0(pos.y),
@@ -264,10 +277,29 @@ glm::ivec3 ModelEditorView::raycastAgainstPlane(int x, int y) const
 
 bool ModelEditorView::getFaceToInsert(Face & face)
 {
+    if(this->mSpriteToInsert.width() == 0 || this->mCurrentTool != Create) {
+        return false;
+    }
+
     glm::ivec3 normal, tangent, cotangent;
     this->getPlane(normal, tangent, cotangent);
-    if(this->mSpriteToInsert.width() == 0) {
-        return false;
+
+    switch(this->mSpriteToInsertRotation % 4)
+    {
+        case 0:
+            break;
+        case 1:
+            std::swap(tangent, cotangent);
+            tangent = -tangent;
+            break;
+        case 2:
+            tangent = -tangent;
+            cotangent = -cotangent;
+            break;
+        case 3:
+            std::swap(tangent, cotangent);
+            cotangent = -cotangent;
+            break;
     }
     face.vertices[0] = Vertex(
         this->mCursorPosition,
@@ -285,6 +317,18 @@ bool ModelEditorView::getFaceToInsert(Face & face)
             + this->mSpriteToInsert.width() * tangent
             + this->mSpriteToInsert.height() * cotangent,
         C(this->mSpriteToInsert.topRight() + QPoint(1,0)));
+
+    if(this->mSpriteToInsertFlipping & Horizontal)
+    {
+        std::swap(face.vertices[0].uv, face.vertices[1].uv);
+        std::swap(face.vertices[2].uv, face.vertices[3].uv);
+    }
+    if(this->mSpriteToInsertFlipping & Vertical)
+    {
+        std::swap(face.vertices[0].uv, face.vertices[2].uv);
+        std::swap(face.vertices[1].uv, face.vertices[3].uv);
+    }
+
     return true;
 }
 
@@ -335,6 +379,122 @@ void ModelEditorView::setMesh(const Mesh & mesh)
     }
     this->repaint();
 }
+
+static void sysOpenGLDebug(
+    GLenum source,
+    GLenum type,
+    GLuint id,
+    GLenum severity,
+    GLsizei length,
+    const GLchar * message,
+    const void *userParam)
+{
+    Q_UNUSED(source);
+    Q_UNUSED(type);
+    Q_UNUSED(id);
+    Q_UNUSED(userParam);
+    QString msg = QString::fromUtf8(message, length);
+    switch(severity)
+    {
+        case GL_DEBUG_SEVERITY_HIGH:
+            qCritical() << msg;
+            break;
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            qCritical() << msg;
+            break;
+        case GL_DEBUG_SEVERITY_LOW:
+            qCritical() << msg;
+            break;
+        case GL_DEBUG_SEVERITY_NOTIFICATION:
+            qInfo() << msg;
+            break;
+        default:
+            qDebug() << msg;
+            break;
+    }
+}
+
+void ModelEditorView::undo()
+{
+    if(this->mUndoStack.size() == 0) {
+        return;
+    }
+    this->mMesh = this->mUndoStack.pop();
+    this->repaint();
+}
+
+void ModelEditorView::rotateFace(Face &face, RotateDir dir)
+{
+    qFatal("rotateFace not implemented yet");
+}
+
+void ModelEditorView::rotateLeft()
+{
+    Face * selection = this->getSelection();
+    if(selection != nullptr) {
+        this->rotateFace(*selection, Left);
+    }
+    if(this->hasInsertion()) {
+        this->mSpriteToInsertRotation -= 1;
+        if(this->mSpriteToInsertRotation < 0) {
+            this->mSpriteToInsertRotation += 4;
+        }
+    }
+    this->repaint();
+}
+
+void ModelEditorView::rotateRight()
+{
+    Face * selection = this->getSelection();
+    if(selection != nullptr) {
+        this->rotateFace(*selection, Right);
+    }
+    if(this->hasInsertion()) {
+        this->mSpriteToInsertRotation += 1;
+        if(this->mSpriteToInsertRotation >= 4) {
+            this->mSpriteToInsertRotation -= 4;
+        }
+    }
+    this->repaint();
+}
+
+void ModelEditorView::switchToTool(Tool tool)
+{
+    if(tool == Create) {
+        qDebug() << "Invalid tool: Create." << "Use beginInsertSprite instead!";
+        return;
+    }
+    this->mCurrentTool = tool;
+}
+
+
+void ModelEditorView::flipVertical()
+{
+    if(this->hasInsertion())
+    {
+        this->mSpriteToInsertFlipping = (Flipping)(this->mSpriteToInsertFlipping ^ Vertical);
+    }
+    if(this->hasSelection())
+    {
+        qFatal("%s not implemented yet", __FUNCTION__);
+    }
+    this->repaint();
+}
+
+void ModelEditorView::flipHorizontal()
+{
+    if(this->hasInsertion())
+    {
+        this->mSpriteToInsertFlipping = (Flipping)(this->mSpriteToInsertFlipping ^ Horizontal);
+    }
+    if(this->hasSelection())
+    {
+        qFatal("%s not implemented yet", __FUNCTION__);
+    }
+    this->repaint();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void ModelEditorView::initializeGL()
 {
@@ -577,47 +737,4 @@ void ModelEditorView::paintGL()
     }
 
     glDepthMask(GL_TRUE);
-}
-
-static void sysOpenGLDebug(
-    GLenum source,
-    GLenum type,
-    GLuint id,
-    GLenum severity,
-    GLsizei length,
-    const GLchar * message,
-    const void *userParam)
-{
-    Q_UNUSED(source);
-    Q_UNUSED(type);
-    Q_UNUSED(id);
-    Q_UNUSED(userParam);
-    QString msg = QString::fromUtf8(message, length);
-    switch(severity)
-    {
-        case GL_DEBUG_SEVERITY_HIGH:
-            qCritical() << msg;
-            break;
-        case GL_DEBUG_SEVERITY_MEDIUM:
-            qCritical() << msg;
-            break;
-        case GL_DEBUG_SEVERITY_LOW:
-            qCritical() << msg;
-            break;
-        case GL_DEBUG_SEVERITY_NOTIFICATION:
-            qInfo() << msg;
-            break;
-        default:
-            qDebug() << msg;
-            break;
-    }
-}
-
-void ModelEditorView::undo()
-{
-    if(this->mUndoStack.size() == 0) {
-        return;
-    }
-    this->mMesh = this->mUndoStack.pop();
-    this->repaint();
 }

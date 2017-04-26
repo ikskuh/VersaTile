@@ -13,6 +13,25 @@ class ModelEditorView : public QOpenGLWidget
 {
     Q_OBJECT
 public:
+    enum Tool
+    {
+        Select,
+        Move,
+        Create,
+        Flip
+    };
+    enum RotateDir
+    {
+        Left,
+        Right
+    };
+    enum Flipping
+    {
+        None = 0,
+        Horizontal = 1,
+        Vertical = 2,
+    };
+public:
     explicit ModelEditorView(QWidget *parent = 0);
 
     virtual void initializeGL() override;
@@ -47,12 +66,25 @@ public:
 
     glm::ivec3 raycastAgainstPlane(int x, int y) const;
 
+    void switchToTool(Tool tool);
+
     void beginInsertSprite(QRect rect) {
         this->mSpriteToInsert = rect;
+        this->mSpriteToInsertRotation = 0;
+        this->mSpriteToInsertFlipping = None;
+        this->mCurrentTool = Create;
         this->repaint();
     }
 
     void undo();
+
+    void rotateRight();
+
+    void rotateLeft();
+
+    void flipVertical();
+
+    void flipHorizontal();
 
 public:
 
@@ -80,6 +112,32 @@ private:
     bool getFaceToInsert(Face & face);
 
     void addUndoStep();
+
+    void rotateFace(Face & face, RotateDir dir);
+
+    /**
+     * @brief Gets a pointer to the current selection if any.
+     * @return pointer to the currently selected face or nullptr.
+     */
+    Face * getSelection() {
+        if(this->hasSelection()) {
+            return &this->mMesh.faces[this->mSelectedFace];
+        } else {
+            return nullptr;
+        }
+    }
+
+    bool hasSelection() {
+        if(this->mCurrentTool == Create) {
+            return false;
+        }
+        return this->mSelectedFace >= 0 && this->mSelectedFace < this->mMesh.faces.size();
+    }
+
+    bool hasInsertion() {
+        return (this->mCurrentTool == Create);
+    }
+
 signals:
 
     void meshIsAboutToChange();
@@ -100,9 +158,13 @@ private:
     glm::mat4 matViewProj;
     int mPlaneAxis;
     QRect mSpriteToInsert;
+    int mSpriteToInsertRotation;
+    Flipping mSpriteToInsertFlipping;
     glm::ivec3 mCursorPosition;
     bool mSnapToCoarseGrid;
     QStack<Mesh> mUndoStack;
+    int mSelectedFace;
+    Tool mCurrentTool;
 };
 
 #endif // MODELEDITORVIEW_H

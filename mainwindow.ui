@@ -53,6 +53,7 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
     <addaction name="separator"/>
+    <addaction name="actionDelete_Face"/>
     <addaction name="actionFlip_Horizontal"/>
     <addaction name="actionFlip_Vertical"/>
     <addaction name="actionRotateRight"/>
@@ -132,6 +133,8 @@
    <addaction name="separator"/>
    <addaction name="actionFlip_Horizontal"/>
    <addaction name="actionFlip_Vertical"/>
+   <addaction name="separator"/>
+   <addaction name="actionDelete_Face"/>
   </widget>
   <widget class="QToolBar" name="toolBar_3">
    <property name="windowTitle">
@@ -360,6 +363,21 @@
    </property>
    <property name="shortcut">
     <string>V</string>
+   </property>
+  </action>
+  <action name="actionDelete_Face">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/delete.png</normaloff>:/data/delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Face</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete Selected Face</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
  </widget>

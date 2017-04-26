@@ -21,6 +21,8 @@ struct Vertex
 struct Face
 {
     Vertex vertices[4];
+
+    bool intersects(glm::vec3 origin, glm::vec3 direction, float * distance = nullptr) const;
 };
 
 struct Mesh

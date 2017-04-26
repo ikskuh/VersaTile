@@ -42,7 +42,8 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
     mSpriteToInsert(), mSpriteToInsertRotation(0), mSpriteToInsertFlipping(None),
     mSnapToCoarseGrid(true),
     mUndoStack(),
-    mSelectedFace(-1)
+    mSelectedFace(-1),
+    mCurrentTool(Select)
 {
     QSurfaceFormat fmt;
     fmt.setVersion(3, 3);
@@ -57,11 +58,13 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
 
 void ModelEditorView::focusInEvent(QFocusEvent *event)
 {
+    Q_UNUSED(event)
     this->grabKeyboard();
 }
 
 void ModelEditorView::focusOutEvent(QFocusEvent *event)
 {
+    Q_UNUSED(event)
     this->releaseKeyboard();
 }
 
@@ -161,8 +164,9 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
             this->mCameraFocus.y -= stepSize;
             break;
         case Qt::Key_Space:
-            // Right button resets the tool to selection
+            // Right button resets the tool to selection and unselect all
             this->mCurrentTool = Select;
+            this->clearSelection();
             break;
         case Qt::Key_Shift:
             this->mSnapToCoarseGrid = false;
@@ -233,105 +237,6 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
     this->repaint();
 }
 
-glm::ivec3 ModelEditorView::raycastAgainstPlane(int x, int y) const
-{
-    // unproject ray here
-    glm::vec3 rayStart(
-        x,
-        this->height() - y - 1,
-        0.0f);
-    glm::vec3 rayEnd(rayStart.x, rayStart.y, 0.8f);
-
-    glm::vec4 viewport(0, 0, this->width(), this->height());
-
-    rayStart = glm::unProject(
-        rayStart,
-        glm::mat4(),
-        this->matViewProj,
-        viewport);
-    rayEnd = glm::unProject(
-        rayEnd,
-        glm::mat4(),
-        this->matViewProj,
-        viewport);
-
-    glm::vec3 l(glm::normalize(rayEnd - rayStart));
-    glm::vec3 l0(rayStart);
-    glm::vec3 p0(this->mCameraFocus);
-    glm::vec3 n(this->planeNormal());
-
-    float dist = glm::dot(p0 - l0, n) / glm::dot(l, n);
-
-    glm::vec3 pos(l0 + dist * l);
-
-    pos = glm::vec3(this->mCameraFocus * this->planeNormal())
-            + glm::vec3(1 - this->planeNormal()) * pos;
-
-    glm::ivec3 result(
-        floor0(pos.x),
-        floor0(pos.y),
-        floor0(pos.z));
-
-    return result;
-}
-
-bool ModelEditorView::getFaceToInsert(Face & face)
-{
-    if(this->mSpriteToInsert.width() == 0 || this->mCurrentTool != Create) {
-        return false;
-    }
-
-    glm::ivec3 normal, tangent, cotangent;
-    this->getPlane(normal, tangent, cotangent);
-
-    switch(this->mSpriteToInsertRotation % 4)
-    {
-        case 0:
-            break;
-        case 1:
-            std::swap(tangent, cotangent);
-            tangent = -tangent;
-            break;
-        case 2:
-            tangent = -tangent;
-            cotangent = -cotangent;
-            break;
-        case 3:
-            std::swap(tangent, cotangent);
-            cotangent = -cotangent;
-            break;
-    }
-    face.vertices[0] = Vertex(
-        this->mCursorPosition,
-        C(this->mSpriteToInsert.bottomLeft() + QPoint(0,1)));
-    face.vertices[1] = Vertex(
-        this->mCursorPosition
-            + this->mSpriteToInsert.width() * tangent,
-        C(this->mSpriteToInsert.bottomRight() + QPoint(1,1)));
-    face.vertices[2] = Vertex(
-        this->mCursorPosition
-            + this->mSpriteToInsert.height() * cotangent,
-        C(this->mSpriteToInsert.topLeft()));
-    face.vertices[3] = Vertex(
-        this->mCursorPosition
-            + this->mSpriteToInsert.width() * tangent
-            + this->mSpriteToInsert.height() * cotangent,
-        C(this->mSpriteToInsert.topRight() + QPoint(1,0)));
-
-    if(this->mSpriteToInsertFlipping & Horizontal)
-    {
-        std::swap(face.vertices[0].uv, face.vertices[1].uv);
-        std::swap(face.vertices[2].uv, face.vertices[3].uv);
-    }
-    if(this->mSpriteToInsertFlipping & Vertical)
-    {
-        std::swap(face.vertices[0].uv, face.vertices[2].uv);
-        std::swap(face.vertices[1].uv, face.vertices[3].uv);
-    }
-
-    return true;
-}
-
 void ModelEditorView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
@@ -340,12 +245,51 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
     glm::ivec3 normal, tangent, cotangent;
     this->getPlane(normal, tangent, cotangent);
 
-    Face face;
-    if(event->button() == Qt::LeftButton && this->getFaceToInsert(face))
+    if(event->button() == Qt::LeftButton)
     {
-        this->meshIsAboutToChange();
-        this->mMesh.faces.push_back(face);
-        this->meshChanged();
+        switch(this->mCurrentTool)
+        {
+            case Select:
+            {
+                glm::vec3 origin, direction;
+                this->getRay(event->x(), event->y(), origin, direction);
+
+                float minDist = std::numeric_limits<float>::max();
+                int index = -1;
+                for(int i = 0; i < this->mMesh.faces.size(); i++)
+                {
+                    float dist;
+                    if(this->mMesh.faces[i].intersects(origin, direction, &dist))
+                    {
+                        if(dist < minDist) {
+                            minDist = dist;
+                            index = i;
+                        }
+                    }
+                }
+
+                // qDebug() << index << minDist;
+                this->mSelectedFace = index;
+
+                break;
+            }
+            case Create:
+            {
+              Face face;
+                if(this->getFaceToInsert(face))
+                {
+                    this->meshIsAboutToChange();
+                    this->mMesh.faces.push_back(face);
+                    this->meshChanged();
+                }
+                break;
+            }
+            default:
+            {
+                qDebug() << "Tool" << this->mCurrentTool << "is not implemented yet.";
+                break;
+            }
+        }
     }
 
     this->repaint();
@@ -494,6 +438,125 @@ void ModelEditorView::flipHorizontal()
     this->repaint();
 }
 
+void ModelEditorView::deleteSelection()
+{
+    if(this->hasSelection() == false) {
+        return;
+    }
+
+    this->meshIsAboutToChange();
+    this->mMesh.faces.erase(this->mMesh.faces.begin() + this->mSelectedFace);
+    this->meshChanged();
+
+    this->clearSelection();
+}
+
+void ModelEditorView::getRay(int x, int y, glm::vec3 & origin, glm::vec3 & direction) const
+{
+    // unproject ray here
+    glm::vec3 rayStart(
+        x,
+        this->height() - y - 1,
+        0.0f);
+    glm::vec3 rayEnd(rayStart.x, rayStart.y, 0.8f);
+
+    glm::vec4 viewport(0, 0, this->width(), this->height());
+
+    rayStart = glm::unProject(
+        rayStart,
+        glm::mat4(),
+        this->matViewProj,
+        viewport);
+    rayEnd = glm::unProject(
+        rayEnd,
+        glm::mat4(),
+        this->matViewProj,
+        viewport);
+
+    direction = glm::normalize(rayEnd - rayStart);
+    origin = rayStart;
+}
+
+glm::ivec3 ModelEditorView::raycastAgainstPlane(int x, int y) const
+{
+    glm::vec3 l, l0;
+    glm::vec3 p0(this->mCameraFocus);
+    glm::vec3 n(this->planeNormal());
+
+    this->getRay(x, y, l0, l);
+
+    float dist = glm::dot(p0 - l0, n) / glm::dot(l, n);
+
+    glm::vec3 pos(l0 + dist * l);
+
+    pos = glm::vec3(this->mCameraFocus * this->planeNormal())
+            + glm::vec3(1 - this->planeNormal()) * pos;
+
+    glm::ivec3 result(
+        floor0(pos.x),
+        floor0(pos.y),
+        floor0(pos.z));
+
+    return result;
+}
+
+bool ModelEditorView::getFaceToInsert(Face & face)
+{
+    if(this->mSpriteToInsert.width() == 0 || this->mCurrentTool != Create) {
+        return false;
+    }
+
+    glm::ivec3 normal, tangent, cotangent;
+    this->getPlane(normal, tangent, cotangent);
+
+    switch(this->mSpriteToInsertRotation % 4)
+    {
+        case 0:
+            break;
+        case 1:
+            std::swap(tangent, cotangent);
+            tangent = -tangent;
+            break;
+        case 2:
+            tangent = -tangent;
+            cotangent = -cotangent;
+            break;
+        case 3:
+            std::swap(tangent, cotangent);
+            cotangent = -cotangent;
+            break;
+    }
+    face.vertices[0] = Vertex(
+        this->mCursorPosition,
+        C(this->mSpriteToInsert.bottomLeft() + QPoint(0,1)));
+    face.vertices[1] = Vertex(
+        this->mCursorPosition
+            + this->mSpriteToInsert.width() * tangent,
+        C(this->mSpriteToInsert.bottomRight() + QPoint(1,1)));
+    face.vertices[2] = Vertex(
+        this->mCursorPosition
+            + this->mSpriteToInsert.height() * cotangent,
+        C(this->mSpriteToInsert.topLeft()));
+    face.vertices[3] = Vertex(
+        this->mCursorPosition
+            + this->mSpriteToInsert.width() * tangent
+            + this->mSpriteToInsert.height() * cotangent,
+        C(this->mSpriteToInsert.topRight() + QPoint(1,0)));
+
+    if(this->mSpriteToInsertFlipping & Horizontal)
+    {
+        std::swap(face.vertices[0].uv, face.vertices[1].uv);
+        std::swap(face.vertices[2].uv, face.vertices[3].uv);
+    }
+    if(this->mSpriteToInsertFlipping & Vertical)
+    {
+        std::swap(face.vertices[0].uv, face.vertices[2].uv);
+        std::swap(face.vertices[1].uv, face.vertices[3].uv);
+    }
+
+    return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void ModelEditorView::initializeGL()
@@ -509,6 +572,8 @@ void ModelEditorView::initializeGL()
     glGetIntegerv(GL_MAJOR_VERSION, &version.major);
     glGetIntegerv(GL_MINOR_VERSION, &version.minor);
     qDebug() << "Initialized OpenGL" << version.major << version.minor;
+
+    glEnable(GL_LINE_SMOOTH);
 
     glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
 
@@ -687,6 +752,7 @@ void ModelEditorView::paintGL()
         glUniform1i(this->locIAlphaTest, 0);
         glUniform4f(this->locVecTint, 1.0f, 1.0f, 1.0f, 0.6f);
 
+        glLineWidth(1.0f);
         glDrawArrays(GL_LINES, 0, vertices.size());
     }
 
@@ -734,6 +800,43 @@ void ModelEditorView::paintGL()
             glUniform4f(this->locVecTint, 1.0f, 1.0f, 1.0f, 1.0f);
             glDrawArrays(GL_TRIANGLES, 0, vertices.size());
         }
+    }
+
+    if(this->hasSelection())
+    { // Render the selection outline
+        glDepthMask(GL_TRUE);
+        this->mPixel->bind();
+
+        Face * sel = this->getSelection();
+
+        vertices.clear();
+
+        vertices.push_back(sel->vertices[0]);
+        vertices.push_back(sel->vertices[1]);
+
+        vertices.push_back(sel->vertices[1]);
+        vertices.push_back(sel->vertices[3]);
+
+        vertices.push_back(sel->vertices[0]);
+        vertices.push_back(sel->vertices[2]);
+
+        vertices.push_back(sel->vertices[2]);
+        vertices.push_back(sel->vertices[3]);
+
+        glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
+        glBufferData(
+            GL_ARRAY_BUFFER,
+            sizeof(Vertex) * vertices.size(),
+            vertices.data(),
+            GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glUniform1i(this->locIAlphaTest, 0);
+        glUniform4f(this->locVecTint, 1.0f, 0.0f, 0.0f, 1.0f);
+
+        glDisable(GL_DEPTH_TEST);
+        glDrawArrays(GL_LINES, 0, vertices.size());
+        glEnable(GL_DEPTH_TEST);
     }
 
     glDepthMask(GL_TRUE);

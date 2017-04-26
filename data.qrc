@@ -17,5 +17,6 @@
         <file>data/tool-select.png</file>
         <file>data/flip-vertical.png</file>
         <file>data/flip-horizontal.png</file>
+        <file>data/delete.png</file>
     </qresource>
 </RCC>

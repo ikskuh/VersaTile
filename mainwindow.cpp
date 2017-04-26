@@ -189,3 +189,8 @@ void MainWindow::on_actionFlip_Vertical_triggered()
 {
     this->mve->flipVertical();
 }
+
+void MainWindow::on_actionDelete_Face_triggered()
+{
+    this->mve->deleteSelection();
+}

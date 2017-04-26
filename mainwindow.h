@@ -37,6 +37,8 @@ private:
      */
     void setModel(const Mesh & mesh);
 
+    void on_mve_modelHasChanged();
+
 private slots:
     void on_actionUndo_triggered();
 
@@ -50,8 +52,6 @@ private slots:
 
     void on_actionOpen_triggered();
 
-    void on_mve_modelHasChanged();
-
     void on_actionRotateRight_triggered();
 
     void on_actionRotateLeft_triggered();
@@ -59,6 +59,8 @@ private slots:
     void on_actionFlip_Horizontal_triggered();
 
     void on_actionFlip_Vertical_triggered();
+
+    void on_actionDelete_Face_triggered();
 
 private:
     Ui::MainWindow *ui;

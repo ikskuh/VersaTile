@@ -86,6 +86,13 @@ public:
 
     void flipHorizontal();
 
+    void deleteSelection();
+
+    void clearSelection() {
+        this->mSelectedFace = -1;
+        this->repaint();
+    }
+
 public:
 
     virtual void focusInEvent(QFocusEvent *event) override;
@@ -106,6 +113,8 @@ private:
     void getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const;
 
     void getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const;
+
+    void getRay(int x, int y, glm::vec3 & origin, glm::vec3 & direction) const;
 
     int determinePlane(const glm::vec3 & direction);
 

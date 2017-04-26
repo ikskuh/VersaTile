@@ -56,6 +56,10 @@ public:
 
 public:
 
+    virtual void focusInEvent(QFocusEvent *event) override;
+
+    virtual void focusOutEvent(QFocusEvent *event) override;
+
     virtual void mouseMoveEvent(QMouseEvent *event) override;
 
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -74,7 +78,12 @@ private:
     int determinePlane(const glm::vec3 & direction);
 
     bool getFaceToInsert(Face & face);
+
+    void addUndoStep();
 signals:
+
+    void meshIsAboutToChange();
+    void meshChanged();
 
 public slots:
 private:

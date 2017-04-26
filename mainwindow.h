@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFileInfo>
 
 #include "modeleditorview.h"
 #include "tilesetviewer.h"
@@ -17,21 +18,46 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private:
+    /**
+     * @brief  Checks if the model is dirty, then
+     *         asks the user if he wants to save his changes.
+     * @return If the model can be changed, this function will return true.
+     */
+    bool ensureModelIsSave();
+
+    /**
+     * @brief Saves the current model under the mCurrentFile path
+     */
+    void save();
+
+    /**
+     * @brief Changes the mesh
+     * @param model
+     */
+    void setModel(const Mesh & mesh);
+
 private slots:
-    void on_actionPlane_Ground_XZ_triggered();
-
-    void on_actionPlane_Front_XY_triggered();
-
-    void on_actionPlane_Side_YZ_triggered();
-
     void on_actionUndo_triggered();
 
     void on_actionQuit_triggered();
+
+    void on_actionSave_triggered();
+
+    void on_actionSave_As_triggered();
+
+    void on_actionNew_triggered();
+
+    void on_actionOpen_triggered();
+
+    void on_mve_modelHasChanged();
 
 private:
     Ui::MainWindow *ui;
     ModelEditorView *mve;
     TileSetViewer *tse;
+    QFileInfo mCurrentFile;
+    bool mModelIsDirty;
 };
 
 #endif // MAINWINDOW_H

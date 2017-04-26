@@ -45,7 +45,27 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
     fmt.setVersion(3, 3);
     this->setFormat(fmt);
     this->setMouseTracking(true);
+    // this->grabKeyboard();
+
+    connect(
+        this, &ModelEditorView::meshIsAboutToChange,
+        this, &ModelEditorView::addUndoStep);
+}
+
+void ModelEditorView::focusInEvent(QFocusEvent *event)
+{
     this->grabKeyboard();
+}
+
+void ModelEditorView::focusOutEvent(QFocusEvent *event)
+{
+    this->releaseKeyboard();
+}
+
+void ModelEditorView::addUndoStep()
+{
+    // Callback when mesh is about to change
+    this->mUndoStack.push(this->mMesh);
 }
 
 void ModelEditorView::getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const
@@ -270,6 +290,7 @@ bool ModelEditorView::getFaceToInsert(Face & face)
 
 void ModelEditorView::mousePressEvent(QMouseEvent *event)
 {
+    this->setFocus();
     mLastMouse = event->pos();
 
     glm::ivec3 normal, tangent, cotangent;
@@ -278,8 +299,9 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
     Face face;
     if(event->button() == Qt::LeftButton && this->getFaceToInsert(face))
     {
-        this->mUndoStack.push(this->mMesh);
+        this->meshIsAboutToChange();
         this->mMesh.faces.push_back(face);
+        this->meshChanged();
     }
 
     this->repaint();

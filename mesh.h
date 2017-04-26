@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <QImage>
+#include <QFile>
 
 struct Vertex
 {
@@ -26,6 +27,10 @@ struct Mesh
 {
     std::vector<Face> faces;
     QImage texture;
+
+    void save(QFile & target) const;
+
+    void load(QFile & source);
 };
 
 #endif // MESH_H

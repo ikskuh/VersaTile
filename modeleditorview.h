@@ -5,6 +5,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLTexture>
 #include <QScopedPointer>
+#include <QStack>
 
 #include "mesh.h"
 
@@ -46,6 +47,13 @@ public:
 
     glm::ivec3 raycastAgainstPlane(int x, int y) const;
 
+    void beginInsertSprite(QRect rect) {
+        this->mSpriteToInsert = rect;
+        this->repaint();
+    }
+
+    void undo();
+
 public:
 
     virtual void mouseMoveEvent(QMouseEvent *event) override;
@@ -59,8 +67,13 @@ public:
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
 private:
-    void getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent);
+    void getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const;
 
+    void getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const;
+
+    int determinePlane(const glm::vec3 & direction);
+
+    bool getFaceToInsert(Face & face);
 signals:
 
 public slots:
@@ -80,6 +93,7 @@ private:
     QRect mSpriteToInsert;
     glm::ivec3 mCursorPosition;
     bool mSnapToCoarseGrid;
+    QStack<Mesh> mUndoStack;
 };
 
 #endif // MODELEDITORVIEW_H

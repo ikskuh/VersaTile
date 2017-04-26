@@ -24,6 +24,10 @@ private slots:
 
     void on_actionPlane_Side_YZ_triggered();
 
+    void on_actionUndo_triggered();
+
+    void on_actionQuit_triggered();
+
 private:
     Ui::MainWindow *ui;
     ModelEditorView *mve;

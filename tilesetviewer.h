@@ -29,6 +29,7 @@ public:
     }
 
 signals:
+    void spriteSelected(QRect sprite);
 
 public slots:
 

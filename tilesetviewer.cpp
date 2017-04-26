@@ -109,6 +109,11 @@ void TileSetViewer::mouseReleaseEvent(QMouseEvent *event)
     {
         if(this->mSelection.width() > 0) {
             // finally, we have selected something :)
+            this->spriteSelected(QRect(
+                16 * this->mSelection.x(),
+                 16 * this->mSelection.y(),
+                 16 * this->mSelection.width(),
+                 16 * this->mSelection.height()));
         }
     }
 }

@@ -3,6 +3,7 @@
 
 #include <QDockWidget>
 #include <QScrollArea>
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -13,18 +14,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->ui->dockWidgetTileset->setWidget(this->tse = new TileSetViewer());
 
+    connect(
+        this->tse, &TileSetViewer::spriteSelected,
+        this->mve, &ModelEditorView::beginInsertSprite);
 
     Mesh mesh;
     mesh.texture = QImage(":/data/tilesets/croco.png");
-    mesh.faces.push_back(Face
-    {
-        {
-            Vertex(glm::ivec3( 0,  0,  0), glm::ivec2(208+0, 80+ 0)),
-            Vertex(glm::ivec3(32,  0,  0), glm::ivec2(208+32,80+ 0)),
-            Vertex(glm::ivec3( 0, 32,  0), glm::ivec2(208+0, 80+32)),
-            Vertex(glm::ivec3(32, 32,  0), glm::ivec2(208+32,80+32)),
-        }
-    });
 
     this->mve->setMesh(mesh);
 
@@ -36,17 +31,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actionPlane_Ground_XZ_triggered()
+void MainWindow::on_actionUndo_triggered()
 {
-    this->mve->setPlaneAxis(1);
+    this->mve->undo();
 }
 
-void MainWindow::on_actionPlane_Front_XY_triggered()
+void MainWindow::on_actionQuit_triggered()
 {
-    this->mve->setPlaneAxis(2);
-}
-
-void MainWindow::on_actionPlane_Side_YZ_triggered()
-{
-    this->mve->setPlaneAxis(0);
+    QApplication::quit();
 }

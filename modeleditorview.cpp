@@ -46,18 +46,39 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
     this->setFormat(fmt);
     this->setMouseTracking(true);
     this->grabKeyboard();
-
-    this->mSpriteToInsert = QRect(32, 32, 48, 32);
 }
 
-void ModelEditorView::getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent)
+void ModelEditorView::getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const
+{
+    this->getPlane(this->mPlaneAxis, normal, tangent, cotangent);
+}
+
+int ModelEditorView::determinePlane(const glm::vec3 & direction)
+{
+    float dot = 0.0f;
+    int idx = 0;
+    // Adjust current plane
+    for(int i = 0; i < 6; i++)
+    {
+        glm::ivec3 normal, tangent, cotangent;
+        this->getPlane(i, normal, tangent, cotangent);
+        float d = glm::dot(glm::vec3(normal), direction);
+        if(d > dot) {
+            idx = i;
+            dot = d;
+        }
+    }
+    return idx;
+}
+
+void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const
 {
     using namespace glm;
-    switch(this->mPlaneAxis)
+    switch(index % 3)
     {
         case 0:
             normal    = ivec3(1, 0, 0);
-            tangent   = ivec3(0, 0, 1);
+            tangent   = ivec3(0, 0, -1);
             cotangent = ivec3(0, 1, 0);
             break;
         case 1:
@@ -71,12 +92,23 @@ void ModelEditorView::getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::iv
             cotangent = ivec3(0, 1, 0);
             break;
     }
+    if(index >= 3) {
+        normal = -normal;
+        tangent = -tangent;
+        cotangent = -cotangent;
+        tangent.y = -tangent.y;
+        cotangent.y = -cotangent.y;
+    }
 }
 
 void ModelEditorView::keyPressEvent(QKeyEvent *event)
 {
+    glm::vec3 cameraDirection(sin(this->mPan), 0.0f, cos(this->mPan));
+    int movementPlane = this->determinePlane(cameraDirection);
+
+
     glm::ivec3 normal, tangent, cotangent;
-    this->getPlane(normal, tangent, cotangent);
+    this->getPlane(movementPlane, normal, tangent, cotangent);
 
     int stepSize = 1;
     if(this->mSnapToCoarseGrid) {
@@ -96,6 +128,16 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
             break;
         case Qt::Key_D:
             this->mCameraFocus -= stepSize * tangent;
+            break;
+        case Qt::Key_E:
+            this->mCameraFocus.y += stepSize;
+            break;
+        case Qt::Key_Q:
+            this->mCameraFocus.y -= stepSize;
+            break;
+        case Qt::Key_Space:
+            // Right button cancels sprite creation
+            this->mSpriteToInsert = QRect(); // We inserted, kill (maybe)
             break;
         case Qt::Key_Shift:
             this->mSnapToCoarseGrid = false;
@@ -128,6 +170,16 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
         if(this->mTilt >= (0.99 * M_PI_2)) {
             this->mTilt = (0.99 * M_PI_2);
         }
+
+        glm::vec3 cameraOffset(
+            sin(this->mPan) * cos(this->mTilt),
+            sin(this->mTilt),
+            cos(this->mPan) * cos(this->mTilt));
+
+        cameraOffset.y *= 0.5f;
+
+        this->mPlaneAxis = this->determinePlane(cameraOffset);
+
     }
     else
     {
@@ -169,7 +221,51 @@ glm::ivec3 ModelEditorView::raycastAgainstPlane(int x, int y) const
 
     float dist = glm::dot(p0 - l0, n) / glm::dot(l, n);
 
-    return glm::ivec3(l0 + dist * l + 0.5f);
+    glm::vec3 pos(l0 + dist * l);
+
+    pos = glm::vec3(this->mCameraFocus * this->planeNormal())
+            + glm::vec3(1 - this->planeNormal()) * pos;
+
+    auto floor0 = [](double value)
+    {
+        if (value < 0.0)
+            return ceil( value );
+        else
+            return floor( value );
+    };
+
+    glm::ivec3 result(
+        floor0(pos.x),
+        floor0(pos.y),
+        floor0(pos.z));
+
+    return result;
+}
+
+bool ModelEditorView::getFaceToInsert(Face & face)
+{
+    glm::ivec3 normal, tangent, cotangent;
+    this->getPlane(normal, tangent, cotangent);
+    if(this->mSpriteToInsert.width() == 0) {
+        return false;
+    }
+    face.vertices[0] = Vertex(
+        this->mCursorPosition,
+        C(this->mSpriteToInsert.bottomLeft() + QPoint(0,1)));
+    face.vertices[1] = Vertex(
+        this->mCursorPosition
+            + this->mSpriteToInsert.width() * tangent,
+        C(this->mSpriteToInsert.bottomRight() + QPoint(1,1)));
+    face.vertices[2] = Vertex(
+        this->mCursorPosition
+            + this->mSpriteToInsert.height() * cotangent,
+        C(this->mSpriteToInsert.topLeft()));
+    face.vertices[3] = Vertex(
+        this->mCursorPosition
+            + this->mSpriteToInsert.width() * tangent
+            + this->mSpriteToInsert.height() * cotangent,
+        C(this->mSpriteToInsert.topRight() + QPoint(1,0)));
+    return true;
 }
 
 void ModelEditorView::mousePressEvent(QMouseEvent *event)
@@ -179,26 +275,10 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
     glm::ivec3 normal, tangent, cotangent;
     this->getPlane(normal, tangent, cotangent);
 
-    if(event->button() == Qt::LeftButton)
+    Face face;
+    if(event->button() == Qt::LeftButton && this->getFaceToInsert(face))
     {
-        Face face;
-        face.vertices[0] = Vertex(
-            this->mCursorPosition,
-            C(this->mSpriteToInsert.topLeft()));
-        face.vertices[1] = Vertex(
-            this->mCursorPosition
-                + this->mSpriteToInsert.width() * tangent,
-            C(this->mSpriteToInsert.topRight()));
-        face.vertices[2] = Vertex(
-            this->mCursorPosition
-                + this->mSpriteToInsert.height() * cotangent,
-            C(this->mSpriteToInsert.bottomLeft()));
-        face.vertices[3] = Vertex(
-            this->mCursorPosition
-                + this->mSpriteToInsert.width() * tangent
-                + this->mSpriteToInsert.height() * cotangent,
-            C(this->mSpriteToInsert.bottomRight()));
-
+        this->mUndoStack.push(this->mMesh);
         this->mMesh.faces.push_back(face);
     }
 
@@ -428,8 +508,9 @@ void ModelEditorView::paintGL()
         glDrawArrays(GL_LINES, 0, vertices.size());
     }
 
-
-    if((this->mMesh.faces.size() > 0) && (this->mTexture != nullptr))
+    Face faceToInsert;
+    bool hasFaceToInsert = this->getFaceToInsert(faceToInsert);
+    if((this->mTexture != nullptr) || ((this->mMesh.faces.size() > 0) || hasFaceToInsert))
     { // Render the 3D model
         glDepthMask(GL_TRUE);
         this->mTexture->bind();
@@ -446,36 +527,31 @@ void ModelEditorView::paintGL()
             vertices.push_back(face.vertices[3]);
         }
 
-        if(this->mSpriteToInsert.width() > 0)
+        if(hasFaceToInsert)
         { // The last sprite is the currently inserted sprite.
 
-            Vertex face[] =
-            {
-                Vertex(this->mCursorPosition, C(this->mSpriteToInsert.topLeft())),
-                Vertex(this->mCursorPosition + this->mSpriteToInsert.width() * tangent, C(this->mSpriteToInsert.topRight())),
-                Vertex(this->mCursorPosition + this->mSpriteToInsert.height() * cotangent, C(this->mSpriteToInsert.bottomLeft())),
-                Vertex(this->mCursorPosition + this->mSpriteToInsert.width() * tangent + this->mSpriteToInsert.height() * cotangent, C(this->mSpriteToInsert.bottomRight())),
-            };
+            vertices.push_back(faceToInsert.vertices[0]);
+            vertices.push_back(faceToInsert.vertices[1]);
+            vertices.push_back(faceToInsert.vertices[3]);
 
-            vertices.push_back(face[0]);
-            vertices.push_back(face[1]);
-            vertices.push_back(face[3]);
-
-            vertices.push_back(face[0]);
-            vertices.push_back(face[2]);
-            vertices.push_back(face[3]);
+            vertices.push_back(faceToInsert.vertices[0]);
+            vertices.push_back(faceToInsert.vertices[2]);
+            vertices.push_back(faceToInsert.vertices[3]);
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
-        glBufferData(
-            GL_ARRAY_BUFFER,
-            sizeof(Vertex) * vertices.size(),
-            vertices.data(),
-            GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glUniform1i(this->locIAlphaTest, 1);
-        glUniform4f(this->locVecTint, 1.0f, 1.0f, 1.0f, 1.0f);
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        if(vertices.size() > 0)
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
+            glBufferData(
+                GL_ARRAY_BUFFER,
+                sizeof(Vertex) * vertices.size(),
+                vertices.data(),
+                GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glUniform1i(this->locIAlphaTest, 1);
+            glUniform4f(this->locVecTint, 1.0f, 1.0f, 1.0f, 1.0f);
+            glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        }
     }
 
     glDepthMask(GL_TRUE);
@@ -513,4 +589,13 @@ static void sysOpenGLDebug(
             qDebug() << msg;
             break;
     }
+}
+
+void ModelEditorView::undo()
+{
+    if(this->mUndoStack.size() == 0) {
+        return;
+    }
+    this->mMesh = this->mUndoStack.pop();
+    this->repaint();
 }

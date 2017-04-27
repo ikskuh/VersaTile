@@ -12,7 +12,7 @@
 ## TODO
 
 - Fixes
-	- Fix the plane "move" uses...
+	x Fix the plane "move" uses...
 
 - Generic Features
 	- Add option to zoom tile set (x2, x3, x4)
@@ -26,16 +26,18 @@
 	- Redo
 
 - Improve grid display
-	- Two grids:
-		- "Insert Grid" at current cursor
-		- "Edit Grid" of selected face
+	- Three grids:
+		x "Insert Grid" at current cursor
+		x "Edit Grid" of selected face
+		x "Displace Grid" which only shows a single line
+			with some ticks on it.
 
 - Post-Edit
 	x Select
 	x Rotate
 	x Flip
 	x Move
-	- Drag Vertex
+	x Drag Vertex
 	- Flip over Edge
 
 - Insert:

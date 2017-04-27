@@ -266,7 +266,9 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				glm::ivec3 newFulcrum(newCenter - this->mMoveOffsetToCursor);
 				if(this->mSnapToCoarseGrid)
 				{
-					newFulcrum = this->mCameraFocus + 16 * floor0(glm::vec3(newFulcrum - this->mCameraFocus) / 16.0f);
+					// we can use the old fulcrum, it sits still on the plane
+					// and won't move from there
+					newFulcrum = face->fulcrum + 16 * floor0(glm::vec3(newFulcrum - face->fulcrum) / 16.0f);
 				}
 
 				for(int i = 0; i < 4; i++)
@@ -295,7 +297,7 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				int distance = (glm::dot(moveOffset, glm::vec3(this->mMoveVertexDirection)));
 				if(this->mSnapToCoarseGrid)
 				{
-					distance = 16 * floor0(distance / 16.0f);
+					distance = 16 * floor0(distance / 16.0f + 0.5);
 				}
 
 				face->vertices[this->mMoveVertexIndex].position =
@@ -349,6 +351,7 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
 						this->mMoveOffsetToCursor = newCenter - selection->fulcrum;
 						this->mCurrentTool = Move;
 						this->meshIsAboutToChange();
+						this->repaint();
 						return;
 					} else {
 						using namespace glm;
@@ -362,6 +365,7 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
 
 						this->mCurrentTool = DisplaceVertex;
 						this->meshIsAboutToChange();
+						this->repaint();
 						return;
 					}
 				}
@@ -687,13 +691,12 @@ glm::ivec3 ModelEditorView::raycastAgainstPlane(glm::vec3 p0, glm::vec3 n, int x
 
 	glm::vec3 pos(l0 + dist * l);
 
-	pos = glm::vec3(this->mCameraFocus * this->planeNormal())
-	        + glm::vec3(1 - this->planeNormal()) * pos;
+	pos = p0 * n + glm::vec3(1.0f - n) * pos;
 
 	glm::ivec3 result(
-	            floor0(pos.x),
-	            floor0(pos.y),
-	            floor0(pos.z));
+	            floor0(pos.x + 0.5),
+	            floor0(pos.y + 0.5),
+	            floor0(pos.z + 0.5));
 
 	return result;
 }

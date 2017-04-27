@@ -977,6 +977,9 @@ void ModelEditorView::paintGL()
 		tangent = vec3(iTangent);
 		cotangent = vec3(iCoTangent);
 
+		int gridWidth = 10;
+		int gridHeight = 10;
+
 		Face * selection = this->getSelection();
 		switch(this->mCurrentTool)
 		{
@@ -998,7 +1001,8 @@ void ModelEditorView::paintGL()
 			}
 			case DisplaceVertex:
 			{
-				origin = vec3(this->mMoveVertexOrigin);
+				// origin = vec3(this->mMoveVertexOrigin);
+				origin = vec3(selection->vertices[this->mMoveVertexIndex].position);
 				normal = this->mMoveVertexPlaneNormal;
 				tangent = this->mMoveVertexDirection;
 				cotangent = normalize(cross(normal, tangent));
@@ -1011,15 +1015,34 @@ void ModelEditorView::paintGL()
 		}
 
 		vertices.clear();
-		for(int u = -10; u <= 10; u++)
-		{
-			for(int v = -10; v <= 10; v++)
+		if(this->mCurrentTool != DisplaceVertex)
+		{ // default drawing
+			for(int u = -gridWidth; u <= gridWidth; u++)
 			{
-				vertices.emplace_back(origin + 16.0f * u * tangent + 16.0f * v * cotangent);
-				vertices.emplace_back(origin + 16.0f * u * tangent - 16.0f * v * cotangent);
+				for(int v = -gridHeight; v <= gridHeight; v++)
+				{
+					vertices.emplace_back(origin + 16.0f * u * tangent + 16.0f * v * cotangent);
+					vertices.emplace_back(origin + 16.0f * u * tangent - 16.0f * v * cotangent);
 
-				vertices.emplace_back(origin + 16.0f * u * cotangent + 16.0f * v * tangent);
-				vertices.emplace_back(origin + 16.0f * u * cotangent - 16.0f * v * tangent);
+					vertices.emplace_back(origin + 16.0f * u * cotangent + 16.0f * v * tangent);
+					vertices.emplace_back(origin + 16.0f * u * cotangent - 16.0f * v * tangent);
+				}
+			}
+		}
+		else
+		{
+			// Line
+			vertices.emplace_back(origin + 16.0f * gridWidth * tangent);
+			vertices.emplace_back(origin - 16.0f * gridWidth * tangent);
+
+			// Ticks
+			for(int u = -gridWidth; u <= gridWidth; u++)
+			{
+				// Grid Tick X
+				vertices.emplace_back(origin + 16.0f * u * tangent + 2.0f * cotangent);
+				vertices.emplace_back(origin + 16.0f * u * tangent - 2.0f * cotangent);
+				vertices.emplace_back(origin + 16.0f * u * tangent + 2.0f * normal);
+				vertices.emplace_back(origin + 16.0f * u * tangent - 2.0f * normal);
 			}
 		}
 

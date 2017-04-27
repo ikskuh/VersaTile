@@ -6,6 +6,7 @@
 #include <QWheelEvent>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 static void sysOpenGLDebug(GLenum,GLenum,GLuint,GLenum,GLsizei,const GLchar*,const void *);
 
@@ -263,12 +264,13 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				    face->fulcrum, face->normal,
 				    event->x(), event->y());
 
+				// Fixed: Fulcrum must snap to center, not newCenter!
+				glm::ivec3 newFulcrum(newCenter - this->mMoveOffsetToCursor);
 				if(this->mSnapToCoarseGrid)
 				{
-					newCenter = 16 * floor0(glm::vec3(newCenter) / 16.0f);
+					newFulcrum = this->mCameraFocus + 16 * floor0(glm::vec3(newFulcrum - this->mCameraFocus) / 16.0f);
 				}
 
-				glm::ivec3 newFulcrum(newCenter - this->mMoveOffsetToCursor);
 				for(int i = 0; i < 4; i++)
 				{
 					face->vertices[i].position += (newFulcrum - face->fulcrum);
@@ -480,8 +482,21 @@ void ModelEditorView::undo()
 
 void ModelEditorView::rotateFace(Face &face, RotateDir dir)
 {
-
-	qFatal("rotateFace not implemented yet");
+	for(int i = 0; i < 4; i++)
+	{
+		glm::ivec3 local = face.vertices[i].position - face.fulcrum;
+		if(dir == Right)
+		{
+			std::swap(local.x, local.y);
+			local.x = -local.x;
+		}
+		else
+		{
+			std::swap(local.x, local.y);
+			local.y = -local.y;
+		}
+		face.vertices[i].position = face.fulcrum + local;
+	}
 }
 
 void ModelEditorView::rotateLeft()

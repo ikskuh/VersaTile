@@ -47,6 +47,7 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
 {
 	QSurfaceFormat fmt;
 	fmt.setVersion(3, 3);
+	fmt.setSamples(8);
 	this->setFormat(fmt);
 	this->setMouseTracking(true);
 	// this->grabKeyboard();
@@ -311,12 +312,18 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
 				qDebug() << i << gizmo;
 				if(gizmo.manhattanLength() < 4) {
 					if(i == 4) {
-						this->mMoveOffsetToCursor = this->mCursorPosition - selection->fulcrum;
+
+						glm::ivec3 newCenter = this->raycastAgainstPlane(
+						    selection->fulcrum, selection->normal,
+						    event->x(), event->y());
+
+						this->mMoveOffsetToCursor = newCenter - selection->fulcrum;
 						this->mCurrentTool = Move;
 						this->meshIsAboutToChange();
 						return;
 					} else {
 						qDebug() << "Clicked gizmo" << i;
+						return;
 					}
 				}
 			}
@@ -471,6 +478,7 @@ void ModelEditorView::undo()
 
 void ModelEditorView::rotateFace(Face &face, RotateDir dir)
 {
+
 	qFatal("rotateFace not implemented yet");
 }
 
@@ -723,6 +731,7 @@ void ModelEditorView::initializeGL()
 	qDebug() << "Initialized OpenGL" << version.major << version.minor;
 
 	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_MULTISAMPLE);
 
 	glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
 

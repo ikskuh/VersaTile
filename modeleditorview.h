@@ -17,8 +17,8 @@ public:
 	{
 		Select,
 		Move,
+		DisplaceVertex,
 		Create,
-		Flip
 	};
 	enum RotateDir
 	{
@@ -143,7 +143,7 @@ private:
 		if(this->mCurrentTool == Create) {
 			return false;
 		}
-		return this->mSelectedFace >= 0 && this->mSelectedFace < this->mMesh.faces.size();
+		return this->mSelectedFace >= 0 && this->mSelectedFace < int(this->mMesh.faces.size());
 	}
 
 	bool hasInsertion() {
@@ -181,6 +181,9 @@ private:
 	Tool mCurrentTool;
 	QPoint mGizmoPositions[5]; // stores screen positions of vertex [0]-[3] and sprite center in [4]
 	glm::ivec3 mMoveOffsetToCursor;
+	int mMoveVertexIndex;
+	glm::ivec3 mMoveVertexOrigin, mMoveVertexDirection;
+	glm::vec3 mMoveVertexPlaneNormal; // <- must be vec3 as it can also be smootly rotated
 };
 
 #endif // MODELEDITORVIEW_H

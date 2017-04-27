@@ -295,7 +295,7 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				int distance = (glm::dot(moveOffset, glm::vec3(this->mMoveVertexDirection)));
 				if(this->mSnapToCoarseGrid)
 				{
-					distance = 16 * floor0(distance / 16.0f);
+					distance = 16 * floor0(distancea / 16.0f);
 				}
 
 				face->vertices[this->mMoveVertexIndex].position =

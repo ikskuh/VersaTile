@@ -48,6 +48,7 @@
      <string>Edit</string>
     </property>
     <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
     <addaction name="separator"/>
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
@@ -77,7 +78,6 @@
     </property>
     <addaction name="actionSelect"/>
     <addaction name="actionMove"/>
-    <addaction name="actionFlip"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -126,7 +126,6 @@
    </attribute>
    <addaction name="actionSelect"/>
    <addaction name="actionMove"/>
-   <addaction name="actionFlip"/>
    <addaction name="separator"/>
    <addaction name="actionRotateLeft"/>
    <addaction name="actionRotateRight"/>
@@ -288,18 +287,6 @@
     <string>Shift+R</string>
    </property>
   </action>
-  <action name="actionFlip">
-   <property name="icon">
-    <iconset resource="data.qrc">
-     <normaloff>:/data/tool-flip.png</normaloff>:/data/tool-flip.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Flip</string>
-   </property>
-   <property name="shortcut">
-    <string>F</string>
-   </property>
-  </action>
   <action name="actionMove">
    <property name="icon">
     <iconset resource="data.qrc">
@@ -341,7 +328,7 @@
      <normaloff>:/data/flip-horizontal.png</normaloff>:/data/flip-horizontal.png</iconset>
    </property>
    <property name="text">
-    <string>Flip Horizontal</string>
+    <string>&amp;Flip Horizontal</string>
    </property>
    <property name="toolTip">
     <string>Flip Horizontal</string>
@@ -356,7 +343,7 @@
      <normaloff>:/data/flip-vertical.png</normaloff>:/data/flip-vertical.png</iconset>
    </property>
    <property name="text">
-    <string>Flip Vertical</string>
+    <string>Flip &amp;Vertical</string>
    </property>
    <property name="toolTip">
     <string>Flip Vertical</string>
@@ -371,13 +358,21 @@
      <normaloff>:/data/delete.png</normaloff>:/data/delete.png</iconset>
    </property>
    <property name="text">
-    <string>Delete Face</string>
+    <string>&amp;Delete Face</string>
    </property>
    <property name="toolTip">
     <string>Delete Selected Face</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
    </property>
   </action>
  </widget>

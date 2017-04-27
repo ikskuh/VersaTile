@@ -482,18 +482,36 @@ void ModelEditorView::undo()
 
 void ModelEditorView::rotateFace(Face &face, RotateDir dir)
 {
+	auto getCoords = [&face](glm::ivec3 & vec, int * & x, int * & y)
+	{
+		if(face.normal[0]) {
+			x = &vec.y;
+			y = &vec.z;
+		} else if(face.normal[1]) {
+			x = &vec.x;
+			y = &vec.z;
+		} else if(face.normal[2]) {
+			x = &vec.x;
+			y = &vec.y;
+		}
+	};
+
 	for(int i = 0; i < 4; i++)
 	{
 		glm::ivec3 local = face.vertices[i].position - face.fulcrum;
+
+		int *x = nullptr, *y = nullptr;
+		getCoords(local, x, y);
+
 		if(dir == Right)
 		{
-			std::swap(local.x, local.y);
-			local.x = -local.x;
+			std::swap(*x, *y);
+			*x = -*x;
 		}
 		else
 		{
-			std::swap(local.x, local.y);
-			local.y = -local.y;
+			std::swap(*x, *y);
+			*y = -*y;
 		}
 		face.vertices[i].position = face.fulcrum + local;
 	}
@@ -503,7 +521,9 @@ void ModelEditorView::rotateLeft()
 {
 	Face * selection = this->getSelection();
 	if(selection != nullptr) {
+		this->meshIsAboutToChange();
 		this->rotateFace(*selection, Left);
+		this->meshChanged();
 	}
 	if(this->hasInsertion()) {
 		this->mSpriteToInsertRotation -= 1;
@@ -519,7 +539,9 @@ void ModelEditorView::rotateRight()
 {
 	Face * selection = this->getSelection();
 	if(selection != nullptr) {
+		this->meshIsAboutToChange();
 		this->rotateFace(*selection, Right);
+		this->meshChanged();
 	}
 	if(this->hasInsertion()) {
 		this->mSpriteToInsertRotation += 1;
@@ -550,8 +572,10 @@ void ModelEditorView::flipVertical()
 	if(this->hasSelection())
 	{
 		Face * face = this->getSelection();
+		this->meshIsAboutToChange();
 		std::swap(face->vertices[0].uv, face->vertices[2].uv);
 		std::swap(face->vertices[1].uv, face->vertices[3].uv);
+		this->meshChanged();
 	}
 	this->repaint();
 }
@@ -565,8 +589,10 @@ void ModelEditorView::flipHorizontal()
 	if(this->hasSelection())
 	{
 		Face * face = this->getSelection();
+		this->meshIsAboutToChange();
 		std::swap(face->vertices[0].uv, face->vertices[1].uv);
 		std::swap(face->vertices[2].uv, face->vertices[3].uv);
+		this->meshChanged();
 	}
 	this->repaint();
 }

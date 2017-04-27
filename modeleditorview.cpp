@@ -549,7 +549,9 @@ void ModelEditorView::flipVertical()
 	}
 	if(this->hasSelection())
 	{
-		qFatal("%s not implemented yet", __FUNCTION__);
+		Face * face = this->getSelection();
+		std::swap(face->vertices[0].uv, face->vertices[2].uv);
+		std::swap(face->vertices[1].uv, face->vertices[3].uv);
 	}
 	this->repaint();
 }
@@ -562,7 +564,9 @@ void ModelEditorView::flipHorizontal()
 	}
 	if(this->hasSelection())
 	{
-		qFatal("%s not implemented yet", __FUNCTION__);
+		Face * face = this->getSelection();
+		std::swap(face->vertices[0].uv, face->vertices[1].uv);
+		std::swap(face->vertices[2].uv, face->vertices[3].uv);
 	}
 	this->repaint();
 }

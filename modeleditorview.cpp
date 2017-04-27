@@ -282,7 +282,9 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				this->mCursorPosition = this->raycastAgainstPlane(event->x(), event->y());
 				if(this->mSnapToCoarseGrid)
 				{
-					this->mCursorPosition = 16 * floor0(glm::vec3(this->mCursorPosition) / 16.0f);
+					// Snap alignment to grid alignment, not to global alignment
+					this->mCursorPosition = this->mCameraFocus
+					    + 16 * floor0(glm::vec3(this->mCursorPosition - this->mCameraFocus) / 16.0f);
 				}
 				break;
 			}
@@ -732,8 +734,10 @@ void ModelEditorView::initializeGL()
 
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_BLEND);
 
 	glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glGenBuffers(1, &this->vbuffer);
 	glGenVertexArrays(1, &this->vao);
@@ -834,9 +838,6 @@ void ModelEditorView::paintGL()
 	this->matViewProj = matProj * matView;
 
 	// glm::mat4 matInvViewProj = glm::inverse(matViewProj);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
 	glClearDepth(1.0f);

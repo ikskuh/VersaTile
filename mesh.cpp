@@ -84,12 +84,14 @@ void Mesh::save(QFile & target) const
     io.setFloatingPointPrecision(QDataStream::DoublePrecision);
 
     io << QString("VERSATILE MESH");
-    io << quint8(1) << quint8(0);
+    io << quint8(1) << quint8(1);
     io << this->texture;
     io << quint32(this->faces.size());
     for(size_t i = 0; i < this->faces.size(); i++)
     {
         Face const & face = this->faces[i];
+        io << face.fulcrum.x << face.fulcrum.y << face.fulcrum.z;
+        io << face.normal.x << face.normal.y << face.normal.z;
         for(int v = 0; v < 4; v++)
         {
             Vertex const & vertex = face.vertices[v];
@@ -112,7 +114,7 @@ void Mesh::load(QFile & source)
     if(header != "VERSATILE MESH") {
         qFatal("Invalid file!");
     }
-    if(versionMajor != 1 || versionMinor != 0) {
+    if(versionMajor != 1) {
         qFatal("Unsupported file version!");
     }
 
@@ -125,11 +127,23 @@ void Mesh::load(QFile & source)
     for(quint32 i = 0; i < count; i++)
     {
         Face & face = this->faces[i];
+        if(versionMinor > 0)
+        {
+            io >> face.fulcrum.x >> face.fulcrum.y >> face.fulcrum.z;
+            io >> face.normal.x >> face.normal.y >> face.normal.z;
+        }
         for(int v = 0; v < 4; v++)
         {
             Vertex & vertex = face.vertices[v];
             io >> vertex.position.x >> vertex.position.y >> vertex.position.z;
             io >> vertex.uv.x >> vertex.uv.y;
+        }
+        if(versionMinor == 0)
+        {
+            face.fulcrum = face.vertices[0].position;
+            face.normal = glm::ivec3(glm::normalize(glm::vec3(glm::cross(
+                glm::vec3(face.vertices[1].position - face.vertices[0].position),
+                glm::vec3(face.vertices[2].position - face.vertices[0].position)))));
         }
     }
 }

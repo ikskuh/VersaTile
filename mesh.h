@@ -20,6 +20,16 @@ struct Vertex
 
 struct Face
 {
+    /**
+     * @brief A point on the plane this face is attached to.
+     */
+    glm::ivec3 fulcrum;
+
+    /**
+     * @brief The normale of the plane this face is attached to.
+     */
+    glm::ivec3 normal;
+
     Vertex vertices[4];
 
     bool intersects(glm::vec3 origin, glm::vec3 direction, float * distance = nullptr) const;

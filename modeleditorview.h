@@ -11,169 +11,176 @@
 
 class ModelEditorView : public QOpenGLWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    enum Tool
-    {
-        Select,
-        Move,
-        Create,
-        Flip
-    };
-    enum RotateDir
-    {
-        Left,
-        Right
-    };
-    enum Flipping
-    {
-        None = 0,
-        Horizontal = 1,
-        Vertical = 2,
-    };
+	enum Tool
+	{
+		Select,
+		Move,
+		Create,
+		Flip
+	};
+	enum RotateDir
+	{
+		Left,
+		Right
+	};
+	enum Flipping
+	{
+		None = 0,
+		Horizontal = 1,
+		Vertical = 2,
+	};
 public:
-    explicit ModelEditorView(QWidget *parent = 0);
+	explicit ModelEditorView(QWidget *parent = 0);
 
-    virtual void initializeGL() override;
+	virtual void initializeGL() override;
 
-    virtual void resizeGL(int w, int h) override;
+	virtual void resizeGL(int w, int h) override;
 
-    virtual void paintGL() override;
+	virtual void paintGL() override;
 
-    void setMesh(const Mesh & mesh);
+	void setMesh(const Mesh & mesh);
 
-    const Mesh & mesh() const { return this->mMesh; }
+	const Mesh & mesh() const { return this->mMesh; }
 
-    Mesh & mesh() { return this->mMesh; }
+	Mesh & mesh() { return this->mMesh; }
 
-    bool hasMesh() const
-    {
-        return !this->mMesh.texture.isNull();
-    }
+	bool hasMesh() const
+	{
+		return !this->mMesh.texture.isNull();
+	}
 
-    void setPlaneAxis(int axis)
-    {
-        this->mPlaneAxis = axis % 3;
-        this->repaint();
-    }
+	void setPlaneAxis(int axis)
+	{
+		this->mPlaneAxis = axis % 3;
+		this->repaint();
+	}
 
-    glm::ivec3 planeNormal() const
-    {
-        glm::ivec3 normal(0,0,0);
-        normal[this->mPlaneAxis % 3] = 1;
-        return normal;
-    }
+	glm::ivec3 planeNormal() const
+	{
+		glm::ivec3 normal(0,0,0);
+		normal[this->mPlaneAxis % 3] = 1;
+		return normal;
+	}
 
-    glm::ivec3 raycastAgainstPlane(int x, int y) const;
+	void switchToTool(Tool tool);
 
-    void switchToTool(Tool tool);
+	void beginInsertSprite(QRect rect) {
+		this->mSpriteToInsert = rect;
+		this->mSpriteToInsertRotation = 0;
+		this->mSpriteToInsertFlipping = None;
+		this->mCurrentTool = Create;
+		this->repaint();
+	}
 
-    void beginInsertSprite(QRect rect) {
-        this->mSpriteToInsert = rect;
-        this->mSpriteToInsertRotation = 0;
-        this->mSpriteToInsertFlipping = None;
-        this->mCurrentTool = Create;
-        this->repaint();
-    }
+	void undo();
 
-    void undo();
+	void rotateRight();
 
-    void rotateRight();
+	void rotateLeft();
 
-    void rotateLeft();
+	void flipVertical();
 
-    void flipVertical();
+	void flipHorizontal();
 
-    void flipHorizontal();
+	void deleteSelection();
 
-    void deleteSelection();
-
-    void clearSelection() {
-        this->mSelectedFace = -1;
-        this->repaint();
-    }
+	void clearSelection() {
+		this->mSelectedFace = -1;
+		this->updateGizmos();
+		this->repaint();
+	}
 
 public:
 
-    virtual void focusInEvent(QFocusEvent *event) override;
+	virtual void focusInEvent(QFocusEvent *event) override;
 
-    virtual void focusOutEvent(QFocusEvent *event) override;
+	virtual void focusOutEvent(QFocusEvent *event) override;
 
-    virtual void mouseMoveEvent(QMouseEvent *event) override;
+	virtual void mouseMoveEvent(QMouseEvent *event) override;
 
-    virtual void mousePressEvent(QMouseEvent *event) override;
+	virtual void mousePressEvent(QMouseEvent *event) override;
 
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+	virtual void mouseReleaseEvent(QMouseEvent *event) override;
 
-    virtual void wheelEvent(QWheelEvent *event) override;
+	virtual void wheelEvent(QWheelEvent *event) override;
 
-    virtual void keyPressEvent(QKeyEvent *event) override;
-    virtual void keyReleaseEvent(QKeyEvent *event) override;
+	virtual void keyPressEvent(QKeyEvent *event) override;
+	virtual void keyReleaseEvent(QKeyEvent *event) override;
 private:
-    void getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const;
+	void getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const;
 
-    void getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const;
+	void getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const;
 
-    void getRay(int x, int y, glm::vec3 & origin, glm::vec3 & direction) const;
+	void getRay(int x, int y, glm::vec3 & origin, glm::vec3 & direction) const;
 
-    int determinePlane(const glm::vec3 & direction);
+	int determinePlane(const glm::vec3 & direction);
 
-    bool getFaceToInsert(Face & face);
+	glm::ivec3 raycastAgainstPlane(int x, int y) const;
 
-    void addUndoStep();
+	glm::ivec3 raycastAgainstPlane(glm::vec3 origin, glm::vec3 normal, int x, int y) const;
 
-    void rotateFace(Face & face, RotateDir dir);
+	bool getFaceToInsert(Face & face);
 
-    /**
-     * @brief Gets a pointer to the current selection if any.
-     * @return pointer to the currently selected face or nullptr.
-     */
-    Face * getSelection() {
-        if(this->hasSelection()) {
-            return &this->mMesh.faces[this->mSelectedFace];
-        } else {
-            return nullptr;
-        }
-    }
+	void addUndoStep();
 
-    bool hasSelection() {
-        if(this->mCurrentTool == Create) {
-            return false;
-        }
-        return this->mSelectedFace >= 0 && this->mSelectedFace < this->mMesh.faces.size();
-    }
+	void rotateFace(Face & face, RotateDir dir);
 
-    bool hasInsertion() {
-        return (this->mCurrentTool == Create);
-    }
+	/**
+	 * @brief Gets a pointer to the current selection if any.
+	 * @return pointer to the currently selected face or nullptr.
+	 */
+	Face * getSelection() {
+		if(this->hasSelection()) {
+			return &this->mMesh.faces[this->mSelectedFace];
+		} else {
+			return nullptr;
+		}
+	}
+
+	bool hasSelection() {
+		if(this->mCurrentTool == Create) {
+			return false;
+		}
+		return this->mSelectedFace >= 0 && this->mSelectedFace < this->mMesh.faces.size();
+	}
+
+	bool hasInsertion() {
+		return (this->mCurrentTool == Create);
+	}
+
+	void updateGizmos();
 
 signals:
 
-    void meshIsAboutToChange();
-    void meshChanged();
+	void meshIsAboutToChange();
+	void meshChanged();
 
 public slots:
 private:
-    Mesh mMesh;
-    QScopedPointer<QOpenGLTexture> mTexture;
-    QScopedPointer<QOpenGLTexture> mPixel;
-    GLuint shader, vao, vbuffer;
-    bool mOpenGLReady;
-    GLint locMatTransform, locTexDiffuse, locVecTint, locIAlphaTest;
-    QPoint mLastMouse;
-    float mPan, mTilt, mZoom;
-    glm::vec3 mCameraPosition;
-    glm::ivec3 mCameraFocus;
-    glm::mat4 matViewProj;
-    int mPlaneAxis;
-    QRect mSpriteToInsert;
-    int mSpriteToInsertRotation;
-    Flipping mSpriteToInsertFlipping;
-    glm::ivec3 mCursorPosition;
-    bool mSnapToCoarseGrid;
-    QStack<Mesh> mUndoStack;
-    int mSelectedFace;
-    Tool mCurrentTool;
+	Mesh mMesh;
+	QScopedPointer<QOpenGLTexture> mTexture;
+	QScopedPointer<QOpenGLTexture> mPixel;
+	GLuint shader, vao, vbuffer;
+	bool mOpenGLReady;
+	GLint locMatTransform, locTexDiffuse, locVecTint, locIAlphaTest;
+	QPoint mLastMouse;
+	float mPan, mTilt, mZoom;
+	glm::vec3 mCameraPosition;
+	glm::ivec3 mCameraFocus;
+	glm::mat4 matViewProj;
+	int mPlaneAxis;
+	QRect mSpriteToInsert;
+	int mSpriteToInsertRotation;
+	Flipping mSpriteToInsertFlipping;
+	glm::ivec3 mCursorPosition;
+	bool mSnapToCoarseGrid;
+	QStack<Mesh> mUndoStack;
+	int mSelectedFace;
+	Tool mCurrentTool;
+	QPoint mGizmoPositions[5]; // stores screen positions of vertex [0]-[3] and sprite center in [4]
+	glm::ivec3 mMoveOffsetToCursor;
 };
 
 #endif // MODELEDITORVIEW_H

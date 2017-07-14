@@ -74,12 +74,16 @@ private slots:
 
 	void on_actionAbout_triggered();
 
+	void on_actionExport_triggered();
+
 private:
 	Ui::MainWindow *ui;
 	ModelEditorView *mve;
 	TileSetViewer *tse;
 	QFileInfo mCurrentFile;
 	bool mModelIsDirty;
+	QFileInfo mCurrentExport;
+	QString mCurrentExportFilter;
 };
 
 #endif // MAINWINDOW_H

@@ -17,6 +17,9 @@
 
 #include "createmodeldialog.h"
 
+#include <assimp/Exporter.hpp>
+#include <assimp/scene.h>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -251,4 +254,37 @@ void MainWindow::on_actionAbout_triggered()
 		"VersaTile is a simple 3D model editor.\n"
 		"Made by: Felix ¨MasterQ32¨ Queißner\n"
 		"Licence: GNU Puplic Licence");
+}
+
+void MainWindow::on_actionExport_triggered()
+{
+	using namespace Assimp;
+
+	QStringList filterNames;
+
+	Exporter exporter;
+	size_t cnt = exporter.GetExportFormatCount();
+	for(size_t i = 0; i < cnt; i++) {
+		aiExportFormatDesc const * desc = exporter.GetExportFormatDescription(i);
+		filterNames << QString(desc->description) + "(*." + QString(desc->fileExtension) + ")";
+	}
+
+	if(this->mCurrentExport.isFile() == false) {
+		this->mCurrentExport = QFileInfo(this->mCurrentFile);
+	}
+
+	QFileDialog dialog(this);
+	dialog.setNameFilters(filterNames);
+	dialog.setFileMode(QFileDialog::AnyFile);
+	dialog.setAcceptMode(QFileDialog::AcceptSave);
+	dialog.setDirectory(this->mCurrentExport.dir());
+	if(dialog.exec() != QFileDialog::Accepted) {
+		return;
+	}
+
+	this->mCurrentExportFilter = dialog.selectedNameFilter();
+	int index = filterNames.indexOf(dialog.selectedNameFilter());
+	qDebug() << index << dialog.selectedNameFilter();
+
+	aiScene scene;
 }

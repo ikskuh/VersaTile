@@ -21,6 +21,8 @@ public:
 		return this->mTilesetImage;
 	}
 
+	int getMinimumTileSize() const;
+
 private slots:
 	void on_lineEdit_textChanged(const QString &arg1);
 

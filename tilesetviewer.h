@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QImage>
+#include "mesh.h"
 
 class TileSetViewer : public QWidget
 {
@@ -27,10 +28,18 @@ public:
 		this->repaint();
 	}
 
-	void setTexture(const QImage & tex);
+	void setMesh(const Mesh & mesh);
+
+	const Mesh & mesh() const {
+		return this->mMesh;
+	}
 
 	const QImage & texture() const {
-		return this->mTexture;
+		return this->mMesh.texture;
+	}
+
+	int tileSize() const {
+		return this->mMesh.minimumTileSize;
 	}
 
 	int scale() const { return this->mScale; }
@@ -51,7 +60,7 @@ signals:
 public slots:
 
 private:
-	QImage mTexture;
+	Mesh mMesh;
 	QRect mSelection;
 	QRect mStartSelection;
 	int mScale;

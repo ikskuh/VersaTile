@@ -84,8 +84,9 @@ void Mesh::save(QFile & target) const
     io.setFloatingPointPrecision(QDataStream::DoublePrecision);
 
     io << QString("VERSATILE MESH");
-    io << quint8(1) << quint8(1);
+    io << quint8(1) << quint8(2); // 1.2 is it
     io << this->texture;
+	io << this->minimumTileSize;
     io << quint32(this->faces.size());
     for(size_t i = 0; i < this->faces.size(); i++)
     {
@@ -119,6 +120,12 @@ void Mesh::load(QFile & source)
     }
 
     io >> this->texture;
+	if(versionMinor >= 2) {
+		io >> this->minimumTileSize;
+	} else {
+		// Previous versions had 16 px fixed.
+		this->minimumTileSize = 16;
+	}
 
     quint32 count;
     io >> count;

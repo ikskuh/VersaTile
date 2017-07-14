@@ -66,6 +66,7 @@ void ModelEditorView::focusOutEvent(QFocusEvent *event)
 {
 	Q_UNUSED(event)
 	this->releaseKeyboard();
+	this->releaseMouse();
 }
 
 void ModelEditorView::addUndoStep()
@@ -138,7 +139,7 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
 
 	int stepSize = 1;
 	if(this->mSnapToCoarseGrid) {
-		stepSize = 16;
+		stepSize = this->mMesh.minimumTileSize;
 	}
 
 	event->setAccepted(true);
@@ -269,7 +270,7 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				{
 					// we can use the old fulcrum, it sits still on the plane
 					// and won't move from there
-					newFulcrum = face->fulcrum + 16 * floor0(glm::vec3(newFulcrum - face->fulcrum) / 16.0f);
+					newFulcrum = face->fulcrum + this->mMesh.minimumTileSize * floor0(glm::vec3(newFulcrum - face->fulcrum) / (float)this->mMesh.minimumTileSize);
 				}
 
 				for(int i = 0; i < 4; i++)
@@ -298,7 +299,7 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				int distance = (glm::dot(moveOffset, glm::vec3(this->mMoveVertexDirection)));
 				if(this->mSnapToCoarseGrid)
 				{
-					distance = 16 * floor0(distance / 16.0f + 0.5);
+					distance = this->mMesh.minimumTileSize * floor0(distance / (float)this->mMesh.minimumTileSize + 0.5);
 				}
 
 				face->vertices[this->mMoveVertexIndex].position =
@@ -314,7 +315,7 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				{
 					// Snap alignment to grid alignment, not to global alignment
 					this->mCursorPosition = this->mCameraFocus
-					    + 16 * floor0(glm::vec3(this->mCursorPosition - this->mCameraFocus) / 16.0f);
+					    + this->mMesh.minimumTileSize * floor0(glm::vec3(this->mCursorPosition - this->mCameraFocus) / (float)this->mMesh.minimumTileSize);
 				}
 				break;
 			}
@@ -1017,6 +1018,8 @@ void ModelEditorView::paintGL()
 			}
 		}
 
+		float gridSize = this->mMesh.minimumTileSize;
+
 		vertices.clear();
 		if(this->mCurrentTool != DisplaceVertex)
 		{ // default drawing
@@ -1024,28 +1027,28 @@ void ModelEditorView::paintGL()
 			{
 				for(int v = -gridHeight; v <= gridHeight; v++)
 				{
-					vertices.emplace_back(origin + 16.0f * u * tangent + 16.0f * v * cotangent);
-					vertices.emplace_back(origin + 16.0f * u * tangent - 16.0f * v * cotangent);
+					vertices.emplace_back(origin + gridSize * u * tangent + gridSize * v * cotangent);
+					vertices.emplace_back(origin + gridSize * u * tangent - gridSize * v * cotangent);
 
-					vertices.emplace_back(origin + 16.0f * u * cotangent + 16.0f * v * tangent);
-					vertices.emplace_back(origin + 16.0f * u * cotangent - 16.0f * v * tangent);
+					vertices.emplace_back(origin + gridSize * u * cotangent + gridSize * v * tangent);
+					vertices.emplace_back(origin + gridSize * u * cotangent - gridSize * v * tangent);
 				}
 			}
 		}
 		else
 		{
 			// Line
-			vertices.emplace_back(origin + 16.0f * gridWidth * tangent);
-			vertices.emplace_back(origin - 16.0f * gridWidth * tangent);
+			vertices.emplace_back(origin + gridSize * gridWidth * tangent);
+			vertices.emplace_back(origin - gridSize * gridWidth * tangent);
 
 			// Ticks
 			for(int u = -gridWidth; u <= gridWidth; u++)
 			{
 				// Grid Tick X
-				vertices.emplace_back(origin + 16.0f * u * tangent + 2.0f * cotangent);
-				vertices.emplace_back(origin + 16.0f * u * tangent - 2.0f * cotangent);
-				vertices.emplace_back(origin + 16.0f * u * tangent + 2.0f * normal);
-				vertices.emplace_back(origin + 16.0f * u * tangent - 2.0f * normal);
+				vertices.emplace_back(origin + gridSize * u * tangent + 2.0f * cotangent);
+				vertices.emplace_back(origin + gridSize * u * tangent - 2.0f * cotangent);
+				vertices.emplace_back(origin + gridSize * u * tangent + 2.0f * normal);
+				vertices.emplace_back(origin + gridSize * u * tangent - 2.0f * normal);
 			}
 		}
 

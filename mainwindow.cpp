@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	Mesh mesh;
 	mesh.texture = QImage(":/data/tilesets/croco.png");
+	mesh.minimumTileSize = 16;
 	this->setModel(mesh);
 }
 
@@ -94,10 +95,9 @@ void MainWindow::on_actionNew_triggered()
 		return;
 	}
 
-	qDebug() << dialog.getTileSet();
-
 	Mesh mesh;
 	mesh.texture = dialog.getTileSet();
+	mesh.minimumTileSize = dialog.getMinimumTileSize();
 	this->setModel(mesh);
 }
 
@@ -189,7 +189,7 @@ void MainWindow::setModel(const Mesh & mesh)
 {
 	qDebug() << "Change mesh, set mesh as clean.";
 	this->mve->setMesh(mesh);
-	this->tse->setTexture(mesh.texture);
+	this->tse->setMesh(mesh);
 	this->mModelIsDirty = false;
 }
 

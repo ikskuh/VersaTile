@@ -27,8 +27,8 @@ All files types that can be exported with the [Assimp](http://assimp.sourceforge
 
 - Generic Features
 	- [x] Add option to zoom tile set (x2, x3, x4)
-	- [ ] Add option to change tile set
-	- [ ] Add option to set minimal grid size
+	- [x] Add option to setup tile set
+	- [x] Add option to set minimal grid size
 	- [ ] Add useful default tile set
 	- [ ] Add export via Assimp
 	- [ ] Add camera control toolbar

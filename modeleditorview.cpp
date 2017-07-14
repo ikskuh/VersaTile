@@ -167,6 +167,7 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
 			// Right button resets the tool to selection and unselect all
 			this->mCurrentTool = Select;
 			this->clearSelection();
+			this->selectionCleared();
 			break;
 		case Qt::Key_Shift:
 			this->mSnapToCoarseGrid = false;

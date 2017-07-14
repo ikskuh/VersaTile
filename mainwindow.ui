@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>809</width>
+    <width>931</width>
     <height>536</height>
    </rect>
   </property>
@@ -26,8 +26,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>809</width>
-     <height>19</height>
+     <width>931</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -39,13 +39,15 @@
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
     <addaction name="separator"/>
+    <addaction name="actionExport"/>
+    <addaction name="separator"/>
     <addaction name="actionOptions"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>Ed&amp;it</string>
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
@@ -79,10 +81,18 @@
     <addaction name="actionSelect"/>
     <addaction name="actionMove"/>
    </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionGitHub_Page"/>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuMode"/>
+   <addaction name="menu"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="windowTitle">
@@ -97,6 +107,8 @@
    <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
+   <addaction name="separator"/>
+   <addaction name="actionExport"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidgetTileset">
@@ -107,12 +119,66 @@
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>T&amp;ile Set</string>
+    <string>Tile Set</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents"/>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMinimumSize</enum>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
+       <item>
+        <widget class="QToolButton" name="toolButtonZoomX1">
+         <property name="text">
+          <string>×1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="toolButtonZoomX2">
+         <property name="text">
+          <string>×2</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="toolButtonZoomX3">
+         <property name="text">
+          <string>×3</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QToolButton" name="toolButtonZoomX4">
+         <property name="text">
+          <string>×4</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QToolBar" name="toolBar_2">
    <property name="windowTitle">
@@ -206,6 +272,10 @@
    </property>
   </action>
   <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/content-copy.png</normaloff>:/data/content-copy.png</iconset>
+   </property>
    <property name="text">
     <string>C&amp;opy</string>
    </property>
@@ -214,6 +284,10 @@
    </property>
   </action>
   <action name="actionCut">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/content-cut.png</normaloff>:/data/content-cut.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Cut</string>
    </property>
@@ -222,6 +296,10 @@
    </property>
   </action>
   <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/content-paste.png</normaloff>:/data/content-paste.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Paste</string>
    </property>
@@ -300,6 +378,10 @@
    </property>
   </action>
   <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/undo-variant.png</normaloff>:/data/undo-variant.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Undo</string>
    </property>
@@ -368,11 +450,48 @@
    </property>
   </action>
   <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/redo-variant.png</normaloff>:/data/redo-variant.png</iconset>
+   </property>
    <property name="text">
-    <string>Redo</string>
+    <string>R&amp;edo</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Y</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/export.png</normaloff>:/data/export.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Export...</string>
+   </property>
+   <property name="toolTip">
+    <string>Export 3D model...</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/information-variant.png</normaloff>:/data/information-variant.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;About...</string>
+   </property>
+  </action>
+  <action name="actionGitHub_Page">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/github-circle.png</normaloff>:/data/github-circle.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;GitHub Page...</string>
+   </property>
+   <property name="toolTip">
+    <string>Go to the GitHub page</string>
    </property>
   </action>
  </widget>

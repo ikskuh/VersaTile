@@ -18,5 +18,13 @@
         <file>data/flip-vertical.png</file>
         <file>data/flip-horizontal.png</file>
         <file>data/delete.png</file>
+        <file>data/content-copy.png</file>
+        <file>data/content-cut.png</file>
+        <file>data/content-paste.png</file>
+        <file>data/export.png</file>
+        <file>data/github-circle.png</file>
+        <file>data/information-variant.png</file>
+        <file>data/undo-variant.png</file>
+        <file>data/redo-variant.png</file>
     </qresource>
 </RCC>

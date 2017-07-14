@@ -156,6 +156,7 @@ signals:
 
 	void meshIsAboutToChange();
 	void meshChanged();
+	void selectionCleared();
 
 public slots:
 private:

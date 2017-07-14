@@ -27,14 +27,19 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     modeleditorview.cpp \
     tilesetviewer.cpp \
-    mesh.cpp
+    mesh.cpp \
+    createmodeldialog.cpp \
+    fileselectionedit.cpp
 
 HEADERS  += mainwindow.h \
     modeleditorview.h \
     tilesetviewer.h \
-    mesh.h
+    mesh.h \
+    createmodeldialog.h \
+    fileselectionedit.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    createmodeldialog.ui
 
 RESOURCES += \
     data.qrc

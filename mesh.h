@@ -40,6 +40,8 @@ struct Mesh
     std::vector<Face> faces;
     QImage texture;
 
+	qint32 minimumTileSize;
+
     void save(QFile & target) const;
 
     void load(QFile & source);

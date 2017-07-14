@@ -15,6 +15,8 @@
 #include <QHBoxLayout>
 #include <QDesktopServices>
 
+#include "createmodeldialog.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -86,8 +88,16 @@ void MainWindow::on_actionNew_triggered()
 	if(this->ensureModelIsSave() == false) {
 		return;
 	}
+
+	CreateModelDialog dialog(this);
+	if(dialog.exec() != QDialog::Accepted) {
+		return;
+	}
+
+	qDebug() << dialog.getTileSet();
+
 	Mesh mesh;
-	mesh.texture = QImage(":/data/tilesets/croco.png");
+	mesh.texture = dialog.getTileSet();
 	this->setModel(mesh);
 }
 

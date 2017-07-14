@@ -892,6 +892,8 @@ void ModelEditorView::initializeGL()
 		this->mTexture->setMinificationFilter(QOpenGLTexture::Nearest);
 		this->mTexture->setMagnificationFilter(QOpenGLTexture::Nearest);
 	}
+
+	this->mOpenGLReady = true;
 }
 
 void ModelEditorView::resizeGL(int w, int h)

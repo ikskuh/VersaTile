@@ -167,6 +167,14 @@ private:
 
 	void animate(float from, float to, void (ModelEditorView::*target)(const QVariant &));
 
+public:
+	void setCameraHome();
+
+	void gotoCameraHome();
+	void gotoCameraFront();
+	void gotoCameraTop();
+	void gotoCameraSide();
+
 private:
 	Mesh mMesh;
 	QScopedPointer<QOpenGLTexture> mTexture;
@@ -193,6 +201,8 @@ private:
 	int mMoveVertexIndex;
 	glm::ivec3 mMoveVertexOrigin, mMoveVertexDirection;
 	glm::vec3 mMoveVertexPlaneNormal; // <- must be vec3 as it can also be smootly rotated
+
+	float mHomePan, mHomeTilt, mHomeZoom;
 };
 
 #endif // MODELEDITORVIEW_H

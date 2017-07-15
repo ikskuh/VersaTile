@@ -67,7 +67,6 @@
      <string>&amp;View</string>
     </property>
     <addaction name="actionHome"/>
-    <addaction name="actionDefault"/>
     <addaction name="actionTop"/>
     <addaction name="actionSide"/>
     <addaction name="actionFront"/>
@@ -78,8 +77,6 @@
     <property name="title">
      <string>Tool</string>
     </property>
-    <addaction name="actionSelect"/>
-    <addaction name="actionMove"/>
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
@@ -190,9 +187,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSelect"/>
-   <addaction name="actionMove"/>
-   <addaction name="separator"/>
    <addaction name="actionRotateLeft"/>
    <addaction name="actionRotateRight"/>
    <addaction name="separator"/>
@@ -212,7 +206,6 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionHome"/>
-   <addaction name="actionDefault"/>
    <addaction name="actionTop"/>
    <addaction name="actionSide"/>
    <addaction name="actionFront"/>
@@ -315,42 +308,40 @@
    <property name="text">
     <string>&amp;Home</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
   </action>
   <action name="actionSet_Home">
    <property name="text">
     <string>S&amp;et Home</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+H</string>
-   </property>
-  </action>
-  <action name="actionDefault">
-   <property name="text">
-    <string>&amp;Default</string>
+    <string>Ctrl+Shift+H</string>
    </property>
   </action>
   <action name="actionTop">
    <property name="text">
     <string>&amp;Top</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
   </action>
   <action name="actionSide">
    <property name="text">
     <string>&amp;Side</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
    </property>
   </action>
   <action name="actionFront">
    <property name="text">
     <string>&amp;Front</string>
    </property>
-  </action>
-  <action name="actionSelect">
-   <property name="icon">
-    <iconset resource="data.qrc">
-     <normaloff>:/data/tool-select.png</normaloff>:/data/tool-select.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Select</string>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
   <action name="actionRotateLeft">
@@ -363,18 +354,6 @@
    </property>
    <property name="shortcut">
     <string>Shift+R</string>
-   </property>
-  </action>
-  <action name="actionMove">
-   <property name="icon">
-    <iconset resource="data.qrc">
-     <normaloff>:/data/tool-move.png</normaloff>:/data/tool-move.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Move</string>
-   </property>
-   <property name="shortcut">
-    <string>M</string>
    </property>
   </action>
   <action name="actionUndo">

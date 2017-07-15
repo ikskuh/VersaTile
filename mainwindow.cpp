@@ -396,3 +396,28 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
 	qDebug() << "fancy" << event->key();
 }
+
+void MainWindow::on_actionHome_triggered()
+{
+    this->mve->gotoCameraHome();
+}
+
+void MainWindow::on_actionSet_Home_triggered()
+{
+    this->mve->setCameraHome();
+}
+
+void MainWindow::on_actionTop_triggered()
+{
+    this->mve->gotoCameraTop();
+}
+
+void MainWindow::on_actionFront_triggered()
+{
+	this->mve->gotoCameraFront();
+}
+
+void MainWindow::on_actionSide_triggered()
+{
+	this->mve->gotoCameraSide();
+}

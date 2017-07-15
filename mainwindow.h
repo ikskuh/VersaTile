@@ -76,6 +76,16 @@ private slots:
 
 	void on_actionExport_triggered();
 
+	void on_actionHome_triggered();
+
+	void on_actionSet_Home_triggered();
+
+	void on_actionTop_triggered();
+
+	void on_actionFront_triggered();
+
+	void on_actionSide_triggered();
+
 public:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 

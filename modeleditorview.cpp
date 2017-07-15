@@ -39,14 +39,15 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
     vao(0),
     vbuffer(0),
     mOpenGLReady(false),
-    mPan(0.0f), mTilt(0.0f), mZoom(128.0f),
+    mPan(0.4f), mTilt(-0.3f), mZoom(128.0f),
     mCameraPosition(), mCameraFocus(), matViewProj(),
     mPlaneAxis(2),
     mSpriteToInsert(), mSpriteToInsertRotation(0), mSpriteToInsertFlipping(None),
     mSnapToCoarseGrid(true),
     mUndoStack(),
     mSelectedFace(-1),
-    mCurrentTool(Select)
+    mCurrentTool(Select),
+    mHomePan(0.4f), mHomeTilt(-0.3f), mHomeZoom(128.0f)
 {
 	QSurfaceFormat fmt;
 	fmt.setVersion(3, 3);
@@ -261,6 +262,38 @@ void ModelEditorView::limitZoom()
 	if(this->mZoom < 32) {
 		this->mZoom = 32;
 	}
+}
+
+void ModelEditorView::setCameraHome()
+{
+	this->mHomePan = this->mPan;
+	this->mHomeTilt = this->mTilt;
+	this->mHomeZoom = this->mZoom;
+}
+
+void ModelEditorView::gotoCameraHome()
+{
+	this->animate(this->mPan, this->mHomePan, &ModelEditorView::setPan);
+	this->animate(this->mTilt, this->mHomeTilt, &ModelEditorView::setTilt);
+	this->animate(this->mZoom, this->mHomeZoom, &ModelEditorView::setZoom);
+}
+
+void ModelEditorView::gotoCameraFront()
+{
+	this->animate(this->mPan, 0.0f, &ModelEditorView::setPan);
+	this->animate(this->mTilt, 0.0f, &ModelEditorView::setTilt);
+}
+
+void ModelEditorView::gotoCameraTop()
+{
+	this->animate(this->mPan, 0.0f, &ModelEditorView::setPan);
+	this->animate(this->mTilt, -M_PI_2, &ModelEditorView::setTilt);
+}
+
+void ModelEditorView::gotoCameraSide()
+{
+	this->animate(this->mPan, M_PI_2, &ModelEditorView::setPan);
+	this->animate(this->mTilt, 0.0f, &ModelEditorView::setTilt);
 }
 
 void ModelEditorView::keyReleaseEvent(QKeyEvent *event)

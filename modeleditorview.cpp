@@ -44,7 +44,7 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
     mPlaneAxis(2),
     mSpriteToInsert(), mSpriteToInsertRotation(0), mSpriteToInsertFlipping(None),
     mSnapToCoarseGrid(true),
-    mUndoStack(),
+    mUndoStack(), mRedoStack(),
     mSelectedFace(-1),
     mCurrentTool(Select),
     mHomePan(0.4f), mHomeTilt(-0.3f), mHomeZoom(128.0f)
@@ -76,6 +76,7 @@ void ModelEditorView::addUndoStep()
 {
 	// Callback when mesh is about to change
 	this->mUndoStack.push(this->mMesh);
+	this->mRedoStack.clear();
 }
 
 void ModelEditorView::getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const
@@ -624,7 +625,23 @@ void ModelEditorView::undo()
 	if(this->mUndoStack.size() == 0) {
 		return;
 	}
+
+	this->mRedoStack.push(this->mMesh);
+
 	this->mMesh = this->mUndoStack.pop();
+	this->clearSelection();
+	this->repaint();
+}
+
+void ModelEditorView::redo()
+{
+	if(this->mRedoStack.size() == 0) {
+		return;
+	}
+
+	this->mUndoStack.push(this->mMesh);
+
+	this->mMesh = this->mRedoStack.pop();
 	this->clearSelection();
 	this->repaint();
 }

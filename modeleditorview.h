@@ -76,6 +76,8 @@ public:
 
 	void undo();
 
+	void redo();
+
 	void rotateRight();
 
 	void rotateLeft();
@@ -193,7 +195,7 @@ private:
 	Flipping mSpriteToInsertFlipping;
 	glm::ivec3 mCursorPosition;
 	bool mSnapToCoarseGrid;
-	QStack<Mesh> mUndoStack;
+	QStack<Mesh> mUndoStack, mRedoStack;
 	int mSelectedFace;
 	Tool mCurrentTool;
 	QPoint mGizmoPositions[5]; // stores screen positions of vertex [0]-[3] and sprite center in [4]

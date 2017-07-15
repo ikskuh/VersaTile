@@ -86,6 +86,8 @@ private slots:
 
 	void on_actionSide_triggered();
 
+	void on_actionRedo_triggered();
+
 public:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 

@@ -48,26 +48,3 @@ model can be constructed this way.
 > TBD
 
 All files types that can be exported with the [Assimp](http://assimp.sourceforge.net/) library.
-
-## TODO
-
-- Generic Features
-	- [x] Add option to zoom tile set (x2, x3, x4)
-	- [x] Add option to setup tile set
-	- [x] Add option to set minimal grid size
-	- [ ] Add useful default tile set
-	- [x] Add export via Assimp
-	- [x] Add camera control toolbar
-	
-- Generic Undo/Redo
-	- [x] Undo
-	- [ ] Redo
-
-- Post-Edit
-	- [x] Select
-	- [x] Rotate
-	- [x] Flip
-	- [x] Move
-	- [x] Drag Vertex
-	- [ ] Flip over Edge
-	- [ ] Move back/forth (use vertex displace)

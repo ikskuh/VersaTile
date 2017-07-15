@@ -421,3 +421,8 @@ void MainWindow::on_actionSide_triggered()
 {
 	this->mve->gotoCameraSide();
 }
+
+void MainWindow::on_actionRedo_triggered()
+{
+    this->mve->redo();
+}

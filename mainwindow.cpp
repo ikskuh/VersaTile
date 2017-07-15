@@ -15,6 +15,7 @@
 #include <QHBoxLayout>
 #include <QDesktopServices>
 #include <QRgb>
+#include <QKeyEvent>
 
 #include "createmodeldialog.h"
 
@@ -389,4 +390,9 @@ void MainWindow::on_actionExport_triggered()
 		dialog.selectedFiles()[0].toStdString(),
 	    aiProcess_Triangulate,
 		nullptr);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+	qDebug() << "fancy" << event->key();
 }

@@ -8,6 +8,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <QVariantAnimation>
+
 static void sysOpenGLDebug(GLenum,GLenum,GLuint,GLenum,GLsizei,const GLchar*,const void *);
 
 static QDebug operator<<(QDebug debug, const glm::vec3 &c)
@@ -59,7 +61,7 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
 void ModelEditorView::focusInEvent(QFocusEvent *event)
 {
 	Q_UNUSED(event)
-	this->grabKeyboard();
+	// this->grabKeyboard();
 }
 
 void ModelEditorView::focusOutEvent(QFocusEvent *event)
@@ -173,12 +175,92 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Shift:
 			this->mSnapToCoarseGrid = false;
 			break;
+		case Qt::Key_6:
+			if(event->modifiers() & Qt::KeypadModifier) {
+				this->animate(this->mPan, this->mPan + M_PI_2, &ModelEditorView::setPan);
+			}
+			break;
+		case Qt::Key_4:
+			if(event->modifiers() & Qt::KeypadModifier) {
+				this->animate(this->mPan, this->mPan - M_PI_2, &ModelEditorView::setPan);
+			}
+			break;
+		case Qt::Key_8:
+			if(event->modifiers() & Qt::KeypadModifier) {
+				this->animate(this->mTilt, this->mTilt - M_PI_2, &ModelEditorView::setTilt);
+			}
+			break;
+		case Qt::Key_2:
+			if(event->modifiers() & Qt::KeypadModifier) {
+				this->animate(this->mTilt, this->mTilt + M_PI_2, &ModelEditorView::setTilt);
+			}
+			break;
+		case Qt::Key_Plus:
+			if(event->modifiers() & Qt::KeypadModifier) {
+				this->animate(this->mZoom, this->mZoom - 64, &ModelEditorView::setZoom);
+			}
+			break;
+		case Qt::Key_Minus:
+			if(event->modifiers() & Qt::KeypadModifier) {
+				this->animate(this->mZoom, this->mZoom + 64, &ModelEditorView::setZoom);
+			}
+			break;
 		default:
 			event->setAccepted(false);
 			return;
 	}
 
 	this->repaint();
+}
+
+void ModelEditorView::animate(float from, float to, void (ModelEditorView::*target)(const QVariant &))
+{
+	auto * anim = new QVariantAnimation(this);
+	anim->setStartValue(QVariant::fromValue(from));
+	anim->setEndValue(QVariant::fromValue(to));
+	anim->setDuration(250);
+	anim->setEasingCurve(QEasingCurve::InOutQuad);
+	anim->start(QVariantAnimation::DeleteWhenStopped);
+	connect(
+		anim, &QVariantAnimation::valueChanged,
+		this, target);
+}
+
+void ModelEditorView::setPan(const QVariant & value)
+{
+	this->mPan = value.toFloat();
+	this->repaint();
+}
+
+void ModelEditorView::setTilt(const QVariant & value)
+{
+	this->mTilt = value.toFloat();
+	this->limitTilt();
+	this->repaint();
+}
+
+void ModelEditorView::setZoom(const QVariant & value)
+{
+	this->mZoom = value.toFloat();
+	this->limitZoom();
+	this->repaint();
+}
+
+void ModelEditorView::limitTilt()
+{
+	if(this->mTilt <= (-0.99 * M_PI_2)) {
+		this->mTilt = (-0.99 * M_PI_2);
+	}
+	if(this->mTilt >= (0.99 * M_PI_2)) {
+		this->mTilt = (0.99 * M_PI_2);
+	}
+}
+
+void ModelEditorView::limitZoom()
+{
+	if(this->mZoom < 32) {
+		this->mZoom = 32;
+	}
 }
 
 void ModelEditorView::keyReleaseEvent(QKeyEvent *event)
@@ -230,12 +312,7 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 	{
 		this->mPan  -= 0.03f * dx;
 		this->mTilt -= 0.03f * dy;
-		if(this->mTilt <= (-0.99 * M_PI_2)) {
-			this->mTilt = (-0.99 * M_PI_2);
-		}
-		if(this->mTilt >= (0.99 * M_PI_2)) {
-			this->mTilt = (0.99 * M_PI_2);
-		}
+		this->limitTilt();
 
 		glm::vec3 cameraOffset(
 		            sin(this->mPan) * cos(this->mTilt),
@@ -454,9 +531,7 @@ void ModelEditorView::mouseReleaseEvent(QMouseEvent *event)
 void ModelEditorView::wheelEvent(QWheelEvent *event)
 {
 	this->mZoom -= 0.25f * event->delta();
-	if(this->mZoom < 32) {
-		this->mZoom = 32;
-	}
+	this->limitZoom();
 	this->updateGizmos();
 	this->repaint();
 }

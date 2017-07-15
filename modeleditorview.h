@@ -158,7 +158,15 @@ signals:
 	void meshChanged();
 	void selectionCleared();
 
-public slots:
+private:
+	void setPan(const QVariant & value);
+	void setTilt(const QVariant & value);
+	void setZoom(const QVariant & value);
+	void limitTilt();
+	void limitZoom();
+
+	void animate(float from, float to, void (ModelEditorView::*target)(const QVariant &));
+
 private:
 	Mesh mMesh;
 	QScopedPointer<QOpenGLTexture> mTexture;

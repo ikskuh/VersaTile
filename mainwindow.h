@@ -76,6 +76,9 @@ private slots:
 
 	void on_actionExport_triggered();
 
+public:
+	virtual void keyPressEvent(QKeyEvent *event) override;
+
 private:
 	Ui::MainWindow *ui;
 	ModelEditorView *mve;

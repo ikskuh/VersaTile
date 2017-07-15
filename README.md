@@ -30,7 +30,7 @@ All files types that can be exported with the [Assimp](http://assimp.sourceforge
 	- [x] Add option to setup tile set
 	- [x] Add option to set minimal grid size
 	- [ ] Add useful default tile set
-	- [ ] Add export via Assimp
+	- [x] Add export via Assimp
 	- [ ] Add camera control toolbar
 	
 - Generic Undo/Redo

@@ -328,7 +328,9 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 	{
 		QPoint gizmo = this->mGizmoPositions[i];
 		gizmo -= event->pos();
-		if(gizmo.manhattanLength() < 6) {
+		auto len = qMax(qAbs(gizmo.x()), qAbs(gizmo.y()));
+
+		if(len <= 6) {
 			if(i < 4) {
 				if(abs(this->planeNormal().y) > 0) {
 					this->setCursor(Qt::SplitVCursor);
@@ -454,7 +456,8 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
 				QPoint gizmo = this->mGizmoPositions[i];
 				gizmo -= event->pos();
 				qDebug() << i << gizmo;
-				if(gizmo.manhattanLength() < 4) {
+				auto len = qMax(qAbs(gizmo.x()), qAbs(gizmo.y()));
+				if(len <= 4) {
 					if(i == 4) {
 
 						glm::ivec3 newCenter = this->raycastAgainstPlane(
@@ -542,6 +545,7 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
 
 void ModelEditorView::mouseReleaseEvent(QMouseEvent *event)
 {
+	this->updateGizmos();
 	switch(event->button())
 	{
 		case Qt::LeftButton:
@@ -899,7 +903,7 @@ void ModelEditorView::updateGizmos()
 		return;
 	}
 
-	glm::vec4 viewport(0, 0, this->width(), this->height());
+	glm::vec4 viewport(0, 0, this->width() - 1, this->height() - 1);
 
 	glm::vec3 acc;
 	for(int i = 0; i < 5; i++)
@@ -919,8 +923,11 @@ void ModelEditorView::updateGizmos()
 		            this->matViewProj,
 		            viewport);
 
+		pos.x /= pos.z;
+		pos.y /= pos.z;
+
 		// round smartly
-		this->mGizmoPositions[i] = QPoint(pos.x, this->height() - pos.y - 1);
+		this->mGizmoPositions[i] = QPoint(pos.x, this->height() - pos.y);
 
 		qDebug() << "#" << i << pos << this->mGizmoPositions[i];
 	}

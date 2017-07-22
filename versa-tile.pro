@@ -46,4 +46,4 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     data.qrc
 
-include(/home/felix/projects/gl3w/gl3w.pri);
+include(gl3w/gl3w.pri);

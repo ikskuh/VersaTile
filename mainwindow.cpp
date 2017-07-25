@@ -87,6 +87,9 @@ void MainWindow::on_actionSave_As_triggered()
 		return;
 	}
 	this->mCurrentFile.setFile(fileName);
+	if(this->mCurrentFile.suffix() != "v3m") {
+		this->mCurrentFile.setFile(this->mCurrentFile.filePath() + ".v3m");
+	}
 	this->save();
 }
 

@@ -110,6 +110,33 @@ void MainWindow::on_actionNew_triggered()
 	this->setModel(mesh);
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+	if(this->mModelIsDirty == false) {
+		return;
+	}
+	int result = QMessageBox::question(
+		this,
+		this->windowTitle(),
+	            "Do you want to save your changes?",
+		QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel),
+		QMessageBox::Cancel);
+	switch(result)
+	{
+		case QMessageBox::Yes:
+			this->on_actionSave_triggered();
+			if(this->mModelIsDirty) {
+				event->ignore();
+			}
+			break;
+		case QMessageBox::No:
+			return;
+		case QMessageBox::Cancel:
+			event->ignore();
+			break;
+	}
+}
+
 void MainWindow::on_actionOpen_triggered()
 {
 	if(this->ensureModelIsSave() == false) {

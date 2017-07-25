@@ -39,6 +39,8 @@ private:
 
 	void on_mve_modelHasChanged();
 
+	virtual void closeEvent(QCloseEvent *event) override;
+
 private slots:
 	void on_actionUndo_triggered();
 

@@ -21,6 +21,7 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
 	this->mSettings.beginGroup("display");
 	this->ui->cbGroundMode->setCurrentIndex(this->mSettings.value("groundmode", 2).toInt());
 	this->ui->sbGroundSize->setValue(this->mSettings.value("groundsize", 10).toInt());
+	this->ui->cbShowCoordinateAxis->setChecked(this->mSettings.value("axis", false).toBool());
 	this->mSettings.endGroup();
 }
 
@@ -39,5 +40,6 @@ void OptionsDialog::on_buttonBox_accepted()
 	this->mSettings.beginGroup("display");
 	this->mSettings.setValue("groundmode", this->ui->cbGroundMode->currentIndex());
 	this->mSettings.setValue("groundsize", this->ui->sbGroundSize->value());
+	this->mSettings.setValue("axis", this->ui->cbShowCoordinateAxis->isChecked());
 	this->mSettings.endGroup();
 }

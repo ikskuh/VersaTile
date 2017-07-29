@@ -67,6 +67,7 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
 	QSurfaceFormat fmt;
 	fmt.setVersion(3, 3);
 	fmt.setSamples(8);
+	fmt.setStencilBufferSize(8);
 	this->setFormat(fmt);
 	this->setMouseTracking(true);
 	connect(
@@ -87,6 +88,7 @@ void ModelEditorView::loadSettings()
 	settings.beginGroup("display");
 	this->mGroundMode = settings.value("groundmode", 2).toInt();
 	this->mGroundSize = settings.value("groundsize", 10).toInt();
+	this->mRenderAxis = settings.value("axis", false).toBool();
 	settings.endGroup();
 
 	this->update();
@@ -1121,7 +1123,8 @@ void ModelEditorView::paintGL()
 
 	glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
 	glClearDepth(1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearStencil(0x01);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	std::vector<Vertex> vertices;
 
@@ -1135,6 +1138,11 @@ void ModelEditorView::paintGL()
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	switch(this->mGroundMode)
 	{
@@ -1217,6 +1225,9 @@ void ModelEditorView::paintGL()
 	{ // Render the fitting grid
 		using namespace glm;
 		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
+
+
 		this->mPixel->bind();
 
 		glm::ivec3 iNormal, iTangent, iCoTangent;
@@ -1314,6 +1325,51 @@ void ModelEditorView::paintGL()
 		glDrawArrays(GL_LINES, 0, vertices.size());
 	}
 
+
+	if(this->mRenderAxis)
+	{
+		glDepthFunc(GL_LEQUAL);
+
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+		float axisLength = 3.0f * this->mMesh.minimumTileSize;
+
+		glUniform1i(this->locIAlphaTest, 0);
+
+		vertices.clear();
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, 0, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(axisLength, 0, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, 0, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, axisLength, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, 0, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, 0, axisLength));
+
+		this->mPixel->bind();
+		glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
+		glBufferData(
+		            GL_ARRAY_BUFFER,
+		            sizeof(Vertex) * vertices.size(),
+		            vertices.data(),
+		            GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glUniform4f(this->locVecTint, 1.0f, 0.0f, 0.0f, 1.0f);
+		glDrawArrays(GL_LINES, 0, 2);
+
+		glUniform4f(this->locVecTint, 0.0f, 1.0f, 0.0f, 1.0f);
+		glDrawArrays(GL_LINES, 2, 2);
+
+		glUniform4f(this->locVecTint, 0.0f, 0.0f, 1.0f, 1.0f);
+		glDrawArrays(GL_LINES, 4, 2);
+
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	}
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 0, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
 	Face faceToInsert;
 	bool hasFaceToInsert = this->getFaceToInsert(faceToInsert);
 	if((this->mTexture != nullptr) || ((this->mMesh.faces.size() > 0) || hasFaceToInsert))
@@ -1363,6 +1419,8 @@ void ModelEditorView::paintGL()
 	if(this->hasSelection())
 	{ // Render the selection outline
 		glDepthMask(GL_TRUE);
+
+
 		this->mPixel->bind();
 
 		Face * sel = this->getSelection();
@@ -1407,6 +1465,56 @@ void ModelEditorView::paintGL()
 		glDrawArrays(GL_POINTS, 0, vertices.size());
 
 		glEnable(GL_DEPTH_TEST);
+	}
+
+
+
+	if(this->mRenderAxis)
+	{
+		glDepthFunc(GL_ALWAYS);
+
+		glEnable(GL_STENCIL_TEST);
+		glStencilMask(0x00);
+		glStencilFunc(GL_EQUAL, 1, 0xFF);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+		glEnable(GL_POLYGON_OFFSET_LINE);
+		glPolygonOffset(1.0f, 5.0f);
+
+
+		float axisLength = 3.0f * this->mMesh.minimumTileSize;
+
+		glUniform1i(this->locIAlphaTest, 0);
+
+		vertices.clear();
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, 0, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(axisLength, 0, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, 0, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, axisLength, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, 0, 0));
+		vertices.emplace_back(glm::vec3(this->mCameraFocus) + glm::vec3(0, 0, axisLength));
+
+		this->mPixel->bind();
+		glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
+		glBufferData(
+		            GL_ARRAY_BUFFER,
+		            sizeof(Vertex) * vertices.size(),
+		            vertices.data(),
+		            GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glUniform4f(this->locVecTint, 1.0f, 0.0f, 0.0f, 1.0f);
+		glDrawArrays(GL_LINES, 0, 2);
+
+		glUniform4f(this->locVecTint, 0.0f, 1.0f, 0.0f, 1.0f);
+		glDrawArrays(GL_LINES, 2, 2);
+
+		glUniform4f(this->locVecTint, 0.0f, 0.0f, 1.0f, 1.0f);
+		glDrawArrays(GL_LINES, 4, 2);
+
+		glDisable(GL_POLYGON_OFFSET_LINE);
+		glPolygonOffset(0.0, 0.0);
+		glDisable(GL_STENCIL_TEST);
 	}
 
 	glDepthMask(GL_TRUE);

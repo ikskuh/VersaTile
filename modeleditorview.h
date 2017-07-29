@@ -181,6 +181,8 @@ public:
 
 	void resetInsertMode();
 
+	void setCameraToSelection();
+
 private:
 	void updateAutoGrid();
 	void selectNextGrid();

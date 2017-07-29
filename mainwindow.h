@@ -94,6 +94,8 @@ private slots:
 
 	void on_actionSelection_Mode_triggered();
 
+	void on_actionFocus_Selection_triggered();
+
 public:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 

@@ -31,6 +31,16 @@ static inline glm::ivec2 C(const QPoint &c)
 	return glm::ivec2(c.x(), c.y());
 }
 
+static int floor0(double value)
+{
+	return floor(value);
+}
+
+static glm::ivec3 floor0(glm::vec3 pos)
+{
+	return glm::ivec3(floor0(pos.x), floor0(pos.y), floor0(pos.z));
+}
+
 ModelEditorView::ModelEditorView(QWidget *parent) :
     QOpenGLWidget(parent),
     mMesh(),
@@ -159,6 +169,23 @@ void ModelEditorView::resetInsertMode()
 	this->clearSelection();
 	this->selectionCleared();
 	this->repaint();
+}
+
+void ModelEditorView::setCameraToSelection()
+{
+	if(this->mSelectedFace < 0) {
+		return;
+	}
+	Face & face = this->mesh().faces.at(this->mSelectedFace);
+	this->mCameraFocus = glm::ivec3(0.25f * glm::vec3(
+		face.vertices[0].position +
+		face.vertices[1].position +
+		face.vertices[2].position +
+		face.vertices[3].position));
+	if(this->mSnapToCoarseGrid) {
+		this->mCameraFocus = this->mMesh.minimumTileSize * floor0(glm::vec3(this->mCameraFocus) / (float)this->mMesh.minimumTileSize);
+	}
+	this->update();
 }
 
 void ModelEditorView::keyPressEvent(QKeyEvent *event)
@@ -330,16 +357,6 @@ void ModelEditorView::keyReleaseEvent(QKeyEvent *event)
 	if(event->key() == Qt::Key_Shift) {
 		this->mSnapToCoarseGrid = true;
 	}
-}
-
-static int floor0(double value)
-{
-	return floor(value);
-}
-
-static glm::ivec3 floor0(glm::vec3 pos)
-{
-	return glm::ivec3(floor0(pos.x), floor0(pos.y), floor0(pos.z));
 }
 
 void ModelEditorView::updateAutoGrid()

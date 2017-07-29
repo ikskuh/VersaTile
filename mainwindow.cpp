@@ -470,3 +470,8 @@ void MainWindow::on_actionSelection_Mode_triggered()
 {
     this->mve->resetInsertMode();
 }
+
+void MainWindow::on_actionFocus_Selection_triggered()
+{
+    this->mve->setCameraToSelection();
+}

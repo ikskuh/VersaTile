@@ -205,6 +205,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionHome"/>
+   <addaction name="actionFocus_Selection"/>
    <addaction name="actionTop"/>
    <addaction name="actionSide"/>
    <addaction name="actionFront"/>
@@ -486,6 +487,18 @@
    </property>
    <property name="shortcut">
     <string>Space</string>
+   </property>
+  </action>
+  <action name="actionFocus_Selection">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/focus.png</normaloff>:/data/focus.png</iconset>
+   </property>
+   <property name="text">
+    <string>Focus Selection</string>
+   </property>
+   <property name="shortcut">
+    <string>F</string>
    </property>
   </action>
  </widget>

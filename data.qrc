@@ -28,5 +28,6 @@
         <file>data/redo-variant.png</file>
         <file>data/settings.png</file>
         <file>data/focus.png</file>
+        <file>data/import.png</file>
     </qresource>
 </RCC>

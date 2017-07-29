@@ -96,6 +96,8 @@ private slots:
 
 	void on_actionFocus_Selection_triggered();
 
+	void on_actionUpdate_texture_triggered();
+
 public:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 

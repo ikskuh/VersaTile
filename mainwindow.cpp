@@ -460,7 +460,6 @@ void MainWindow::on_actionPreferences_triggered()
 	OptionsDialog dialog(this);
 	dialog.exec();
 	this->mve->loadSettings();
-	// this->tse->update();
 }
 
 void MainWindow::on_actionSelection_Mode_triggered()
@@ -471,4 +470,29 @@ void MainWindow::on_actionSelection_Mode_triggered()
 void MainWindow::on_actionFocus_Selection_triggered()
 {
     this->mve->setCameraToSelection();
+}
+
+void MainWindow::on_actionUpdate_texture_triggered()
+{
+	QString file = QFileDialog::getOpenFileName(
+		this,
+		"Select the tileset you want to use",
+		QString(),
+		"Image Files (*.png *.jpg *.bmp)");
+	if(file.isNull()) {
+		return;
+	}
+	QImage newTexture(file);
+	if(newTexture.isNull()) {
+		QMessageBox::warning(
+			this,
+			this->windowTitle(),
+			"Failed to open image file!");
+		return;
+	}
+
+	Mesh mesh(this->mve->mesh());
+	mesh.texture = newTexture;
+	this->mve->setMesh(mesh);
+	this->tse->setMesh(mesh);
 }

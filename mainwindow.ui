@@ -39,6 +39,7 @@
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
     <addaction name="separator"/>
+    <addaction name="actionUpdate_texture"/>
     <addaction name="actionExport"/>
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
@@ -512,6 +513,18 @@
    </property>
    <property name="shortcut">
     <string>F</string>
+   </property>
+  </action>
+  <action name="actionUpdate_texture">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/import.png</normaloff>:/data/import.png</iconset>
+   </property>
+   <property name="text">
+    <string>Update texture</string>
+   </property>
+   <property name="toolTip">
+    <string>Updates the texture</string>
    </property>
   </action>
  </widget>

@@ -39,6 +39,8 @@ private:
 
 	void on_mve_modelHasChanged();
 
+	virtual void closeEvent(QCloseEvent *event) override;
+
 private slots:
 	void on_actionUndo_triggered();
 
@@ -87,6 +89,12 @@ private slots:
 	void on_actionSide_triggered();
 
 	void on_actionRedo_triggered();
+
+	void on_actionPreferences_triggered();
+
+	void on_actionSelection_Mode_triggered();
+
+	void on_actionFocus_Selection_triggered();
 
 public:
 	virtual void keyPressEvent(QKeyEvent *event) override;

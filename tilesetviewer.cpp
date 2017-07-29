@@ -87,10 +87,10 @@ void TileSetViewer::mousePressEvent(QMouseEvent *event)
 {
 	int x = event->x() - 4;
 	int y = event->y() - 4;
-	if(x < 0 || x >= this->texture().width()) {
+	if(x < 0 || x >= (this->mScale * this->texture().width())) {
 		return;
 	}
-	if(y < 0 || y >= this->texture().height()) {
+	if(y < 0 || y >= (this->mScale * this->texture().height())) {
 		return;
 	}
 

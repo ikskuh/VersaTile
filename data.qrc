@@ -26,5 +26,7 @@
         <file>data/information-variant.png</file>
         <file>data/undo-variant.png</file>
         <file>data/redo-variant.png</file>
+        <file>data/settings.png</file>
+        <file>data/focus.png</file>
     </qresource>
 </RCC>

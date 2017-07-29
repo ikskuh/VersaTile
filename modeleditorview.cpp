@@ -9,6 +9,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <QVariantAnimation>
+#include <QSettings>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -33,6 +34,16 @@ static inline glm::ivec2 C(const QPoint &c)
 	return glm::ivec2(c.x(), c.y());
 }
 
+static int floor0(double value)
+{
+	return floor(value);
+}
+
+static glm::ivec3 floor0(glm::vec3 pos)
+{
+	return glm::ivec3(floor0(pos.x), floor0(pos.y), floor0(pos.z));
+}
+
 ModelEditorView::ModelEditorView(QWidget *parent) :
     QOpenGLWidget(parent),
     mMesh(),
@@ -50,7 +61,8 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
     mUndoStack(), mRedoStack(),
     mSelectedFace(-1),
     mCurrentTool(Select),
-    mHomePan(0.4f), mHomeTilt(-0.3f), mHomeZoom(128.0f)
+    mHomePan(0.4f), mHomeTilt(-0.3f), mHomeZoom(128.0f),
+    mGroundSize(1)
 {
 	QSurfaceFormat fmt;
 	fmt.setVersion(3, 3);
@@ -60,6 +72,24 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
 	connect(
 	    this, &ModelEditorView::meshIsAboutToChange,
 	    this, &ModelEditorView::addUndoStep);
+
+	this->loadSettings();
+}
+
+void ModelEditorView::loadSettings()
+{
+	QSettings settings("mq32.de", "versa-tile");
+	settings.beginGroup("behaviour");
+	this->mAutoGrid = settings.value("autogrid", true).toBool();
+	this->mAutoGridThreshold = 0.01f * settings.value("gridthresh", 50).toInt();
+	settings.endGroup();
+
+	settings.beginGroup("display");
+	this->mGroundMode = settings.value("groundmode", 2).toInt();
+	this->mGroundSize = settings.value("groundsize", 10).toInt();
+	settings.endGroup();
+
+	this->update();
 }
 
 void ModelEditorView::focusInEvent(QFocusEvent *event)
@@ -96,7 +126,7 @@ int ModelEditorView::determinePlane(const glm::vec3 & direction)
 	{
 		glm::ivec3 normal, tangent, cotangent;
 		this->getPlane(i, normal, tangent, cotangent);
-		float d = glm::dot(glm::vec3(normal), direction);
+		float d = std::abs(glm::dot(glm::vec3(normal), direction));
 		if(d > dot) {
 			idx = i;
 			dot = d;
@@ -112,7 +142,7 @@ void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tange
 	{
 		case 0:
 			normal    = ivec3(1, 0, 0);
-			tangent   = ivec3(0, 0, -1);
+			tangent   = ivec3(0, 0, 1);
 			cotangent = ivec3(0, 1, 0);
 			break;
 		case 1:
@@ -126,6 +156,7 @@ void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tange
 			cotangent = ivec3(0, 1, 0);
 			break;
 	}
+	/*
 	if(index >= 3) {
 		normal = -normal;
 		tangent = -tangent;
@@ -133,6 +164,33 @@ void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tange
 		tangent.y = -tangent.y;
 		cotangent.y = -cotangent.y;
 	}
+	*/
+}
+
+void ModelEditorView::resetInsertMode()
+{
+	// Right button resets the tool to selection and unselect all
+	this->mCurrentTool = Select;
+	this->clearSelection();
+	this->selectionCleared();
+	this->repaint();
+}
+
+void ModelEditorView::setCameraToSelection()
+{
+	if(this->mSelectedFace < 0) {
+		return;
+	}
+	Face & face = this->mesh().faces.at(this->mSelectedFace);
+	this->mCameraFocus = glm::ivec3(0.25f * glm::vec3(
+		face.vertices[0].position +
+		face.vertices[1].position +
+		face.vertices[2].position +
+		face.vertices[3].position));
+	if(this->mSnapToCoarseGrid) {
+		this->mCameraFocus = this->mMesh.minimumTileSize * floor0(glm::vec3(this->mCameraFocus) / (float)this->mMesh.minimumTileSize);
+	}
+	this->update();
 }
 
 void ModelEditorView::keyPressEvent(QKeyEvent *event)
@@ -171,11 +229,10 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Q:
 			this->mCameraFocus.y -= stepSize;
 			break;
-		case Qt::Key_Space:
-			// Right button resets the tool to selection and unselect all
-			this->mCurrentTool = Select;
-			this->clearSelection();
-			this->selectionCleared();
+		case Qt::Key_G:
+			if(this->mAutoGrid == false) {
+				this->selectNextGrid();
+			}
 			break;
 		case Qt::Key_Shift:
 			this->mSnapToCoarseGrid = false;
@@ -307,17 +364,25 @@ void ModelEditorView::keyReleaseEvent(QKeyEvent *event)
 	}
 }
 
-static int floor0(double value)
+void ModelEditorView::updateAutoGrid()
 {
-	// if (value > 0.0)
-	//     return ceil( value );
-	// else
-	return floor( value );
+	glm::vec3 cameraOffset(
+				sin(this->mPan) * cos(this->mTilt),
+				sin(this->mTilt),
+				cos(this->mPan) * cos(this->mTilt));
+
+	cameraOffset.y *= this->mAutoGridThreshold;
+
+	this->mPlaneAxis = this->determinePlane(cameraOffset);
+	this->updateGizmos();
+	this->update();
 }
 
-static glm::ivec3 floor0(glm::vec3 pos)
+void ModelEditorView::selectNextGrid()
 {
-	return glm::ivec3(floor0(pos.x), floor0(pos.y), floor0(pos.z));
+	this->mPlaneAxis = (this->mPlaneAxis + 1) % 3;
+	this->updateGizmos();
+	this->update();
 }
 
 void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
@@ -331,7 +396,9 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 	{
 		QPoint gizmo = this->mGizmoPositions[i];
 		gizmo -= event->pos();
-		if(gizmo.manhattanLength() < 6) {
+		auto len = qMax(qAbs(gizmo.x()), qAbs(gizmo.y()));
+
+		if(len <= 6) {
 			if(i < 4) {
 				if(abs(this->planeNormal().y) > 0) {
 					this->setCursor(Qt::SplitVCursor);
@@ -351,16 +418,9 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 		this->mTilt -= 0.03f * dy;
 		this->limitTilt();
 
-		glm::vec3 cameraOffset(
-		            sin(this->mPan) * cos(this->mTilt),
-		            sin(this->mTilt),
-		            cos(this->mPan) * cos(this->mTilt));
-
-		cameraOffset.y *= 0.5f;
-
-		this->mPlaneAxis = this->determinePlane(cameraOffset);
-
-		this->updateGizmos();
+		if(this->mAutoGrid) {
+			this->updateAutoGrid();
+		}
 	}
 	else
 	{
@@ -457,7 +517,8 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
 				QPoint gizmo = this->mGizmoPositions[i];
 				gizmo -= event->pos();
 				qDebug() << i << gizmo;
-				if(gizmo.manhattanLength() < 4) {
+				auto len = qMax(qAbs(gizmo.x()), qAbs(gizmo.y()));
+				if(len <= 4) {
 					if(i == 4) {
 
 						glm::ivec3 newCenter = this->raycastAgainstPlane(
@@ -545,6 +606,7 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
 
 void ModelEditorView::mouseReleaseEvent(QMouseEvent *event)
 {
+	this->updateGizmos();
 	switch(event->button())
 	{
 		case Qt::LeftButton:
@@ -902,7 +964,7 @@ void ModelEditorView::updateGizmos()
 		return;
 	}
 
-	glm::vec4 viewport(0, 0, this->width(), this->height());
+	glm::vec4 viewport(0, 0, this->width() - 1, this->height() - 1);
 
 	glm::vec3 acc;
 	for(int i = 0; i < 5; i++)
@@ -922,8 +984,11 @@ void ModelEditorView::updateGizmos()
 		            this->matViewProj,
 		            viewport);
 
+		pos.x /= pos.z;
+		pos.y /= pos.z;
+
 		// round smartly
-		this->mGizmoPositions[i] = QPoint(pos.x, this->height() - pos.y - 1);
+		this->mGizmoPositions[i] = QPoint(pos.x, this->height() - pos.y);
 
 		qDebug() << "#" << i << pos << this->mGizmoPositions[i];
 	}
@@ -1071,28 +1136,82 @@ void ModelEditorView::paintGL()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	{ // Render a ground plane
-		glDepthMask(GL_TRUE);
-		this->mPixel->bind();
+	switch(this->mGroundMode)
+	{
+		case 0: // no ground
+			break;
 
-		vertices.clear();
-		vertices.emplace_back(glm::ivec3(-256, 0, -256));
-		vertices.emplace_back(glm::ivec3( 256, 0, -256));
-		vertices.emplace_back(glm::ivec3(-256, 0,  256));
-		vertices.emplace_back(glm::ivec3( 256, 0,  256));
+		case 1: { // grid mode
+			int gridWidth = this->mGroundSize;
+			int gridHeight = this->mGroundSize;
+			float gridSize = this->mMesh.minimumTileSize;
 
-		glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
-		glBufferData(
-		            GL_ARRAY_BUFFER,
-		            sizeof(Vertex) * vertices.size(),
-		            vertices.data(),
-		            GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+			if(gridWidth <= 0 || gridHeight <= 0) {
+				break;
+			}
 
-		glUniform1i(this->locIAlphaTest, 0);
-		glUniform4f(this->locVecTint, 0.28f, 0.54f, 0.28f, 1.0f);
+			glm::vec3 origin(0, 0, 0);
+			glm::vec3 tangent(1, 0, 0);
+			glm::vec3 cotangent(0, 0, 1);
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
+			vertices.clear();
+			for(int u = -gridWidth; u <= gridWidth; u++)
+			{
+				for(int v = -gridHeight; v <= gridHeight; v++)
+				{
+					vertices.emplace_back(origin + gridSize * u * tangent + gridSize * v * cotangent);
+					vertices.emplace_back(origin + gridSize * u * tangent - gridSize * v * cotangent);
+
+					vertices.emplace_back(origin + gridSize * u * cotangent + gridSize * v * tangent);
+					vertices.emplace_back(origin + gridSize * u * cotangent - gridSize * v * tangent);
+				}
+			}
+
+			this->mPixel->bind();
+			glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
+			glBufferData(
+			            GL_ARRAY_BUFFER,
+			            sizeof(Vertex) * vertices.size(),
+			            vertices.data(),
+			            GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glUniform1i(this->locIAlphaTest, 0);
+			glUniform4f(this->locVecTint, 0.0f, 0.8f, 0.8f, 1.0f);
+
+			glLineWidth(1.0f);
+			glDrawArrays(GL_LINES, 0, vertices.size());
+
+			break;
+		}
+
+		case 2: // plane mode
+			// Render a ground plane
+			glDepthMask(GL_TRUE);
+			this->mPixel->bind();
+
+			auto size = this->mMesh.minimumTileSize * this->mGroundSize;
+
+			vertices.clear();
+			vertices.emplace_back(glm::ivec3(-size, 0, -size));
+			vertices.emplace_back(glm::ivec3( size, 0, -size));
+			vertices.emplace_back(glm::ivec3(-size, 0,  size));
+			vertices.emplace_back(glm::ivec3( size, 0,  size));
+
+			glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
+			glBufferData(
+						GL_ARRAY_BUFFER,
+						sizeof(Vertex) * vertices.size(),
+						vertices.data(),
+						GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glUniform1i(this->locIAlphaTest, 0);
+			glUniform4f(this->locVecTint, 0.28f, 0.54f, 0.28f, 1.0f);
+
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
+
+			break;
 	}
 
 	{ // Render the fitting grid

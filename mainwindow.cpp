@@ -18,6 +18,7 @@
 #include <QKeyEvent>
 
 #include "createmodeldialog.h"
+#include "optionsdialog.h"
 
 #include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
@@ -28,12 +29,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	this->setCentralWidget(this->mve = new ModelEditorView());
 
-	this->tse = new TileSetViewer();
-
-	this->ui->dockWidgetContents->layout()->addWidget(this->tse);
-	this->ui->dockWidgetContents->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+	this->mve = this->ui->modelViewEditor;
+	this->tse = this->ui->tileSetViewer;
 
 	connect(
 	    this->tse, &TileSetViewer::spriteSelected,
@@ -87,6 +85,9 @@ void MainWindow::on_actionSave_As_triggered()
 		return;
 	}
 	this->mCurrentFile.setFile(fileName);
+	if(this->mCurrentFile.suffix() != "v3m") {
+		this->mCurrentFile.setFile(this->mCurrentFile.filePath() + ".v3m");
+	}
 	this->save();
 }
 
@@ -105,6 +106,33 @@ void MainWindow::on_actionNew_triggered()
 	mesh.texture = dialog.getTileSet();
 	mesh.minimumTileSize = dialog.getMinimumTileSize();
 	this->setModel(mesh);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+	if(this->mModelIsDirty == false) {
+		return;
+	}
+	int result = QMessageBox::question(
+		this,
+		this->windowTitle(),
+	            "Do you want to save your changes?",
+		QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel),
+		QMessageBox::Cancel);
+	switch(result)
+	{
+		case QMessageBox::Yes:
+			this->on_actionSave_triggered();
+			if(this->mModelIsDirty) {
+				event->ignore();
+			}
+			break;
+		case QMessageBox::No:
+			return;
+		case QMessageBox::Cancel:
+			event->ignore();
+			break;
+	}
 }
 
 void MainWindow::on_actionOpen_triggered()
@@ -425,4 +453,22 @@ void MainWindow::on_actionSide_triggered()
 void MainWindow::on_actionRedo_triggered()
 {
     this->mve->redo();
+}
+
+void MainWindow::on_actionPreferences_triggered()
+{
+	OptionsDialog dialog(this);
+	dialog.exec();
+	this->mve->loadSettings();
+	// this->tse->update();
+}
+
+void MainWindow::on_actionSelection_Mode_triggered()
+{
+    this->mve->resetInsertMode();
+}
+
+void MainWindow::on_actionFocus_Selection_triggered()
+{
+    this->mve->setCameraToSelection();
 }

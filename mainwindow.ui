@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Versa-Tile 3D Editor</string>
   </property>
-  <widget class="QWidget" name="centralWidget">
+  <widget class="ModelEditorView" name="modelViewEditor">
    <property name="minimumSize">
     <size>
      <width>750</width>
@@ -41,7 +41,7 @@
     <addaction name="separator"/>
     <addaction name="actionExport"/>
     <addaction name="separator"/>
-    <addaction name="actionOptions"/>
+    <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -52,15 +52,14 @@
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
     <addaction name="separator"/>
-    <addaction name="actionCut"/>
-    <addaction name="actionCopy"/>
-    <addaction name="actionPaste"/>
+    <addaction name="actionSelection_Mode"/>
     <addaction name="separator"/>
-    <addaction name="actionDelete_Face"/>
     <addaction name="actionFlip_Horizontal"/>
     <addaction name="actionFlip_Vertical"/>
     <addaction name="actionRotateRight"/>
     <addaction name="actionRotateLeft"/>
+    <addaction name="separator"/>
+    <addaction name="actionDelete_Face"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -73,11 +72,6 @@
     <addaction name="separator"/>
     <addaction name="actionSet_Home"/>
    </widget>
-   <widget class="QMenu" name="menuMode">
-    <property name="title">
-     <string>Tool</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
      <string>Help</string>
@@ -88,7 +82,6 @@
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
-   <addaction name="menuMode"/>
    <addaction name="menu"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -174,6 +167,23 @@
        </item>
       </layout>
      </item>
+     <item>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="TileSetViewer" name="tileSetViewer">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>160</width>
+          <height>386</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -187,6 +197,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionSelection_Mode"/>
+   <addaction name="separator"/>
    <addaction name="actionRotateLeft"/>
    <addaction name="actionRotateRight"/>
    <addaction name="separator"/>
@@ -206,6 +218,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionHome"/>
+   <addaction name="actionFocus_Selection"/>
    <addaction name="actionTop"/>
    <addaction name="actionSide"/>
    <addaction name="actionFront"/>
@@ -254,7 +267,11 @@
     <string>Ctrl+Shift+S</string>
    </property>
   </action>
-  <action name="actionOptions">
+  <action name="actionPreferences">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/settings.png</normaloff>:/data/settings.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Preferences</string>
    </property>
@@ -473,8 +490,46 @@
     <string>Go to the GitHub page</string>
    </property>
   </action>
+  <action name="actionSelection_Mode">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/tool-select.png</normaloff>:/data/tool-select.png</iconset>
+   </property>
+   <property name="text">
+    <string>Selection Mode</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
+   </property>
+  </action>
+  <action name="actionFocus_Selection">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/focus.png</normaloff>:/data/focus.png</iconset>
+   </property>
+   <property name="text">
+    <string>Focus Selection</string>
+   </property>
+   <property name="shortcut">
+    <string>F</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>TileSetViewer</class>
+   <extends>QWidget</extends>
+   <header location="global">tilesetviewer.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ModelEditorView</class>
+   <extends>QWidget</extends>
+   <header location="global">modeleditorview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="data.qrc"/>
  </resources>

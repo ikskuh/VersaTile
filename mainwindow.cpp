@@ -31,10 +31,12 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->setupUi(this);
 	this->setCentralWidget(this->mve = new ModelEditorView());
 
-	this->tse = new TileSetViewer();
+	// this->tse = new TileSetViewer();
 
-	this->ui->dockWidgetContents->layout()->addWidget(this->tse);
-	this->ui->dockWidgetContents->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+	// this->ui->dockWidgetContents->layout()->addWidget(this->tse);
+	// this->ui->dockWidgetContents->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+
+	this->tse = this->ui->tileSetViewer;
 
 	connect(
 	    this->tse, &TileSetViewer::spriteSelected,

@@ -171,6 +171,23 @@
        </item>
       </layout>
      </item>
+     <item>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="TileSetViewer" name="tileSetViewer">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>160</width>
+          <height>386</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -503,6 +520,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>TileSetViewer</class>
+   <extends>QWidget</extends>
+   <header location="global">tilesetviewer.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="data.qrc"/>
  </resources>

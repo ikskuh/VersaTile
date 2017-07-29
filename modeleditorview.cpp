@@ -114,7 +114,7 @@ void ModelEditorView::addUndoStep()
 
 void ModelEditorView::getPlane(glm::ivec3 & normal,glm::ivec3 & tangent, glm::ivec3 & cotangent) const
 {
-	this->getPlane(this->mPlaneAxis, normal, tangent, cotangent);
+	this->getPlane(this->mPlaneAxis % 3, normal, tangent, cotangent);
 }
 
 int ModelEditorView::determinePlane(const glm::vec3 & direction)
@@ -126,7 +126,7 @@ int ModelEditorView::determinePlane(const glm::vec3 & direction)
 	{
 		glm::ivec3 normal, tangent, cotangent;
 		this->getPlane(i, normal, tangent, cotangent);
-		float d = std::abs(glm::dot(glm::vec3(normal), direction));
+		float d = glm::dot(glm::vec3(normal), direction);
 		if(d > dot) {
 			idx = i;
 			dot = d;
@@ -156,7 +156,6 @@ void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tange
 			cotangent = ivec3(0, 1, 0);
 			break;
 	}
-	/*
 	if(index >= 3) {
 		normal = -normal;
 		tangent = -tangent;
@@ -164,7 +163,6 @@ void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tange
 		tangent.y = -tangent.y;
 		cotangent.y = -cotangent.y;
 	}
-	*/
 }
 
 void ModelEditorView::resetInsertMode()
@@ -198,9 +196,13 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
 	glm::vec3 cameraDirection(sin(this->mPan), 0.0f, cos(this->mPan));
 	int movementPlane = this->determinePlane(cameraDirection);
 
-
 	glm::ivec3 normal, tangent, cotangent;
 	this->getPlane(movementPlane, normal, tangent, cotangent);
+
+	// Adjust coordinates to movement axis
+	if((movementPlane%3) == 0) {
+		tangent = -tangent;
+	}
 
 	int stepSize = 1;
 	if(this->mSnapToCoarseGrid) {

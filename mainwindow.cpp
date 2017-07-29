@@ -18,6 +18,7 @@
 #include <QKeyEvent>
 
 #include "createmodeldialog.h"
+#include "optionsdialog.h"
 
 #include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
@@ -455,4 +456,12 @@ void MainWindow::on_actionSide_triggered()
 void MainWindow::on_actionRedo_triggered()
 {
     this->mve->redo();
+}
+
+void MainWindow::on_actionPreferences_triggered()
+{
+	OptionsDialog dialog(this);
+	dialog.exec();
+	this->mve->update();
+	this->tse->update();
 }

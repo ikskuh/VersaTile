@@ -306,10 +306,7 @@ void ModelEditorView::keyReleaseEvent(QKeyEvent *event)
 
 static int floor0(double value)
 {
-	// if (value > 0.0)
-	//     return ceil( value );
-	// else
-	return floor( value );
+	return floor(value);
 }
 
 static glm::ivec3 floor0(glm::vec3 pos)

@@ -41,7 +41,7 @@
     <addaction name="separator"/>
     <addaction name="actionExport"/>
     <addaction name="separator"/>
-    <addaction name="actionOptions"/>
+    <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -254,7 +254,11 @@
     <string>Ctrl+Shift+S</string>
    </property>
   </action>
-  <action name="actionOptions">
+  <action name="actionPreferences">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/settings.png</normaloff>:/data/settings.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Preferences</string>
    </property>

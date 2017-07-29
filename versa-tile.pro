@@ -31,17 +31,20 @@ SOURCES += main.cpp\
     tilesetviewer.cpp \
     mesh.cpp \
     createmodeldialog.cpp \
-    fileselectionedit.cpp
+    fileselectionedit.cpp \
+    optionsdialog.cpp
 
 HEADERS  += mainwindow.h \
     modeleditorview.h \
     tilesetviewer.h \
     mesh.h \
     createmodeldialog.h \
-    fileselectionedit.h
+    fileselectionedit.h \
+    optionsdialog.h
 
 FORMS    += mainwindow.ui \
-    createmodeldialog.ui
+    createmodeldialog.ui \
+    optionsdialog.ui
 
 RESOURCES += \
     data.qrc

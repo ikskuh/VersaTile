@@ -90,6 +90,8 @@ private slots:
 
 	void on_actionRedo_triggered();
 
+	void on_actionPreferences_triggered();
+
 public:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 

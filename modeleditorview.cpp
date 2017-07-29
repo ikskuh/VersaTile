@@ -10,6 +10,9 @@
 
 #include <QVariantAnimation>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 static void sysOpenGLDebug(GLenum,GLenum,GLuint,GLenum,GLsizei,const GLchar*,const void *);
 
 static QDebug operator<<(QDebug debug, const glm::vec3 &c)
@@ -592,8 +595,8 @@ static void sysOpenGLDebug(
         GLuint id,
         GLenum severity,
         GLsizei length,
-        const GLchar * message,
-        const void *userParam)
+        GLchar const * message,
+        void const * userParam)
 {
 	Q_UNUSED(source);
 	Q_UNUSED(type);

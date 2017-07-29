@@ -5,8 +5,23 @@
 #-------------------------------------------------
 
 QT        += core gui
-CONFIG    += link_pkgconfig
-PKGCONFIG += assimp
+
+linux {
+    CONFIG    += link_pkgconfig
+    PKGCONFIG += assimp
+}
+win32 {
+    LIBS += -L$$quote(C:\Users\Felix\Desktop\assimp\build\x64) assimp-vc140-mt.lib IrrXML.lib zlibstatic.lib
+    INCLUDEPATH += $$quote(C:\Users\Felix\Desktop\assimp\include)
+    DEPENDPATH  += $$quote(C:\Users\Felix\Desktop\assimp\include)
+    INCLUDEPATH += $$quote(C:\Users\Felix\Desktop\assimp\build\include)
+    DEPENDPATH  += $$quote(C:\Users\Felix\Desktop\assimp\build\include)
+
+    INCLUDEPATH += $$quote(../glm/)
+    DEPENDPATH += $$quote(../glm/)
+}
+
+include(../gl3w/gl3w.pri);
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -45,5 +60,3 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     data.qrc
-
-include(/home/felix/projects/gl3w/gl3w.pri);

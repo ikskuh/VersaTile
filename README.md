@@ -102,6 +102,7 @@ model.
 | Ctrl+G       | Rotate camera into **Side** position                         |
 | Ctrl+Shift+H | Set camera home position                                     |
 | G            | When AutoGrid is disabled, selects the next grid option      |
+| F            | Moves the camera center to the currently selected tile.      |
 
 ## Supported Export Formats
 Versa-Tile supports exporting the created 3D models with [Assimp](http://assimp.sourceforge.net/).

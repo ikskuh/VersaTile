@@ -123,7 +123,7 @@ int ModelEditorView::determinePlane(const glm::vec3 & direction)
 	{
 		glm::ivec3 normal, tangent, cotangent;
 		this->getPlane(i, normal, tangent, cotangent);
-		float d = glm::dot(glm::vec3(normal), direction);
+		float d = std::abs(glm::dot(glm::vec3(normal), direction));
 		if(d > dot) {
 			idx = i;
 			dot = d;
@@ -139,7 +139,7 @@ void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tange
 	{
 		case 0:
 			normal    = ivec3(1, 0, 0);
-			tangent   = ivec3(0, 0, -1);
+			tangent   = ivec3(0, 0, 1);
 			cotangent = ivec3(0, 1, 0);
 			break;
 		case 1:
@@ -153,6 +153,7 @@ void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tange
 			cotangent = ivec3(0, 1, 0);
 			break;
 	}
+	/*
 	if(index >= 3) {
 		normal = -normal;
 		tangent = -tangent;
@@ -160,6 +161,7 @@ void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tange
 		tangent.y = -tangent.y;
 		cotangent.y = -cotangent.y;
 	}
+	*/
 }
 
 void ModelEditorView::resetInsertMode()

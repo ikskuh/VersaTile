@@ -462,6 +462,6 @@ void MainWindow::on_actionPreferences_triggered()
 {
 	OptionsDialog dialog(this);
 	dialog.exec();
-	this->mve->update();
-	this->tse->update();
+	this->mve->loadSettings();
+	// this->tse->update();
 }

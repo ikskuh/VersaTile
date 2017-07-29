@@ -9,6 +9,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include <QVariantAnimation>
+#include <QSettings>
 
 static void sysOpenGLDebug(GLenum,GLenum,GLuint,GLenum,GLsizei,const GLchar*,const void *);
 
@@ -57,6 +58,23 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
 	connect(
 	    this, &ModelEditorView::meshIsAboutToChange,
 	    this, &ModelEditorView::addUndoStep);
+
+	this->loadSettings();
+}
+
+void ModelEditorView::loadSettings()
+{
+	QSettings settings("mq32.de", "versa-tile");
+	settings.beginGroup("behaviour");
+	this->mAutoGrid = settings.value("autogrid", true).toBool();
+	this->mAutoGridThreshold = 0.01f * settings.value("gridthresh", 50).toInt();
+	settings.endGroup();
+
+	settings.beginGroup("display");
+	this->mGroundMode = settings.value("groundmode", 2).toInt();
+	settings.endGroup();
+
+	this->update();
 }
 
 void ModelEditorView::focusInEvent(QFocusEvent *event)
@@ -167,6 +185,11 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
 			break;
 		case Qt::Key_Q:
 			this->mCameraFocus.y -= stepSize;
+			break;
+		case Qt::Key_G:
+			if(this->mAutoGrid == false) {
+				this->selectNextGrid();
+			}
 			break;
 		case Qt::Key_Space:
 			// Right button resets the tool to selection and unselect all
@@ -314,6 +337,27 @@ static glm::ivec3 floor0(glm::vec3 pos)
 	return glm::ivec3(floor0(pos.x), floor0(pos.y), floor0(pos.z));
 }
 
+void ModelEditorView::updateAutoGrid()
+{
+	glm::vec3 cameraOffset(
+				sin(this->mPan) * cos(this->mTilt),
+				sin(this->mTilt),
+				cos(this->mPan) * cos(this->mTilt));
+
+	cameraOffset.y *= this->mAutoGridThreshold;
+
+	this->mPlaneAxis = this->determinePlane(cameraOffset);
+	this->updateGizmos();
+	this->update();
+}
+
+void ModelEditorView::selectNextGrid()
+{
+	this->mPlaneAxis = (this->mPlaneAxis + 1) % 3;
+	this->updateGizmos();
+	this->update();
+}
+
 void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 {
 	int dx = event->x() - this->mLastMouse.x();
@@ -347,16 +391,9 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 		this->mTilt -= 0.03f * dy;
 		this->limitTilt();
 
-		glm::vec3 cameraOffset(
-		            sin(this->mPan) * cos(this->mTilt),
-		            sin(this->mTilt),
-		            cos(this->mPan) * cos(this->mTilt));
-
-		cameraOffset.y *= 0.5f;
-
-		this->mPlaneAxis = this->determinePlane(cameraOffset);
-
-		this->updateGizmos();
+		if(this->mAutoGrid) {
+			this->updateAutoGrid();
+		}
 	}
 	else
 	{

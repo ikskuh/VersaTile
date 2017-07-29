@@ -74,6 +74,8 @@ public:
 		this->repaint();
 	}
 
+	void loadSettings();
+
 	void undo();
 
 	void redo();
@@ -178,6 +180,10 @@ public:
 	void gotoCameraSide();
 
 private:
+	void updateAutoGrid();
+	void selectNextGrid();
+
+private:
 	Mesh mMesh;
 	QScopedPointer<QOpenGLTexture> mTexture;
 	QScopedPointer<QOpenGLTexture> mPixel;
@@ -205,6 +211,10 @@ private:
 	glm::vec3 mMoveVertexPlaneNormal; // <- must be vec3 as it can also be smootly rotated
 
 	float mHomePan, mHomeTilt, mHomeZoom;
+
+	bool mAutoGrid;
+	float mAutoGridThreshold;
+	int mGroundMode;
 };
 
 #endif // MODELEDITORVIEW_H

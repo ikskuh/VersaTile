@@ -101,6 +101,7 @@ model.
 | Ctrl+F       | Rotate camera into **Front** position                        |
 | Ctrl+G       | Rotate camera into **Side** position                         |
 | Ctrl+Shift+H | Set camera home position                                     |
+| G            | When AutoGrid is disabled, selects the next grid option      |
 
 ## Supported Export Formats
 Versa-Tile supports exporting the created 3D models with [Assimp](http://assimp.sourceforge.net/).
@@ -110,3 +111,27 @@ On export, the **Y-axis** is **up** and the model is scaled in a way that a sing
 texture pixel is equivalent to one model unit.
 
 So a model that is 64 pixels wide is also 64 units wide.
+
+## Options
+
+### Behaviour
+
+#### Automatic adjust grid orientation
+When this option is active, the grid will align itself with the camera
+as soon as it is moved.
+
+#### Horizontal Grid Threshold
+This is a factor from `0.0`…`1.0` that scales the **y axis** when determining
+the current auto grid.
+
+The lower this is, the later the grid will align into "horizontal" mode,
+allowing more camera movement before swapping into horizontal mode.
+
+### Display
+
+#### Ground Display
+
+Determines the way a ground plane is shown. When **None**, no ground plane is
+visible, **Grid** is a static horizontal grid, even when the vertical one
+is shown and **Solid** is a solid, green surface that is supposed to resemble
+a grassy ground.

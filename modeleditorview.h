@@ -183,9 +183,9 @@ public:
 
 	void setCameraToSelection();
 
+	void selectNextGrid();
 private:
 	void updateAutoGrid();
-	void selectNextGrid();
 
 private:
 	Mesh mMesh;

@@ -29,5 +29,6 @@
         <file>data/settings.png</file>
         <file>data/focus.png</file>
         <file>data/import.png</file>
+        <file>data/grid.png</file>
     </qresource>
 </RCC>

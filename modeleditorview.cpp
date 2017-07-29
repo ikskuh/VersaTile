@@ -231,11 +231,6 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Q:
 			this->mCameraFocus.y -= stepSize;
 			break;
-		case Qt::Key_G:
-			if(this->mAutoGrid == false) {
-				this->selectNextGrid();
-			}
-			break;
 		case Qt::Key_Shift:
 			this->mSnapToCoarseGrid = false;
 			break;
@@ -382,6 +377,9 @@ void ModelEditorView::updateAutoGrid()
 
 void ModelEditorView::selectNextGrid()
 {
+	if(this->mAutoGrid) {
+		return;
+	}
 	this->mPlaneAxis = (this->mPlaneAxis + 1) % 3;
 	this->updateGizmos();
 	this->update();

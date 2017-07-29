@@ -54,6 +54,7 @@
     <addaction name="actionRedo"/>
     <addaction name="separator"/>
     <addaction name="actionSelection_Mode"/>
+    <addaction name="actionSwap_Grid_Plane"/>
     <addaction name="separator"/>
     <addaction name="actionFlip_Horizontal"/>
     <addaction name="actionFlip_Vertical"/>
@@ -199,6 +200,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionSelection_Mode"/>
+   <addaction name="actionSwap_Grid_Plane"/>
    <addaction name="separator"/>
    <addaction name="actionRotateLeft"/>
    <addaction name="actionRotateRight"/>
@@ -525,6 +527,21 @@
    </property>
    <property name="toolTip">
     <string>Updates the texture</string>
+   </property>
+  </action>
+  <action name="actionSwap_Grid_Plane">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/grid.png</normaloff>:/data/grid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Swap Grid Plane</string>
+   </property>
+   <property name="toolTip">
+    <string>Swaps the currently active grid</string>
+   </property>
+   <property name="shortcut">
+    <string>G</string>
    </property>
   </action>
  </widget>

@@ -496,3 +496,8 @@ void MainWindow::on_actionUpdate_texture_triggered()
 	this->mve->setMesh(mesh);
 	this->tse->setMesh(mesh);
 }
+
+void MainWindow::on_actionSwap_Grid_Plane_triggered()
+{
+    this->mve->selectNextGrid();
+}

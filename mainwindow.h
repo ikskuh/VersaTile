@@ -98,6 +98,8 @@ private slots:
 
 	void on_actionUpdate_texture_triggered();
 
+	void on_actionSwap_Grid_Plane_triggered();
+
 public:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 

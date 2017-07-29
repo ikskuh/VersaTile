@@ -1109,28 +1109,76 @@ void ModelEditorView::paintGL()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	{ // Render a ground plane
-		glDepthMask(GL_TRUE);
-		this->mPixel->bind();
+	switch(this->mGroundMode)
+	{
+		case 0: // no ground
+			break;
 
-		vertices.clear();
-		vertices.emplace_back(glm::ivec3(-256, 0, -256));
-		vertices.emplace_back(glm::ivec3( 256, 0, -256));
-		vertices.emplace_back(glm::ivec3(-256, 0,  256));
-		vertices.emplace_back(glm::ivec3( 256, 0,  256));
+		case 1: { // grid mode
+			int gridWidth = 10;
+			int gridHeight = 10;
+			float gridSize = this->mMesh.minimumTileSize;
 
-		glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
-		glBufferData(
-		            GL_ARRAY_BUFFER,
-		            sizeof(Vertex) * vertices.size(),
-		            vertices.data(),
-		            GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glm::vec3 origin(0, 0, 0);
+			glm::vec3 tangent(1, 0, 0);
+			glm::vec3 cotangent(0, 0, 1);
 
-		glUniform1i(this->locIAlphaTest, 0);
-		glUniform4f(this->locVecTint, 0.28f, 0.54f, 0.28f, 1.0f);
+			vertices.clear();
+			for(int u = -gridWidth; u <= gridWidth; u++)
+			{
+				for(int v = -gridHeight; v <= gridHeight; v++)
+				{
+					vertices.emplace_back(origin + gridSize * u * tangent + gridSize * v * cotangent);
+					vertices.emplace_back(origin + gridSize * u * tangent - gridSize * v * cotangent);
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
+					vertices.emplace_back(origin + gridSize * u * cotangent + gridSize * v * tangent);
+					vertices.emplace_back(origin + gridSize * u * cotangent - gridSize * v * tangent);
+				}
+			}
+
+			this->mPixel->bind();
+			glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
+			glBufferData(
+			            GL_ARRAY_BUFFER,
+			            sizeof(Vertex) * vertices.size(),
+			            vertices.data(),
+			            GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glUniform1i(this->locIAlphaTest, 0);
+			glUniform4f(this->locVecTint, 0.0f, 0.8f, 0.8f, 1.0f);
+
+			glLineWidth(1.0f);
+			glDrawArrays(GL_LINES, 0, vertices.size());
+
+			break;
+		}
+
+		case 2: // plane mode
+			// Render a ground plane
+			glDepthMask(GL_TRUE);
+			this->mPixel->bind();
+
+			vertices.clear();
+			vertices.emplace_back(glm::ivec3(-256, 0, -256));
+			vertices.emplace_back(glm::ivec3( 256, 0, -256));
+			vertices.emplace_back(glm::ivec3(-256, 0,  256));
+			vertices.emplace_back(glm::ivec3( 256, 0,  256));
+
+			glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
+			glBufferData(
+						GL_ARRAY_BUFFER,
+						sizeof(Vertex) * vertices.size(),
+						vertices.data(),
+						GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glUniform1i(this->locIAlphaTest, 0);
+			glUniform4f(this->locVecTint, 0.28f, 0.54f, 0.28f, 1.0f);
+
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
+
+			break;
 	}
 
 	{ // Render the fitting grid

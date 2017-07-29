@@ -52,10 +52,6 @@
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
     <addaction name="separator"/>
-    <addaction name="actionCut"/>
-    <addaction name="actionCopy"/>
-    <addaction name="actionPaste"/>
-    <addaction name="separator"/>
     <addaction name="actionSelection_Mode"/>
     <addaction name="separator"/>
     <addaction name="actionFlip_Horizontal"/>

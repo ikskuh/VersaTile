@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Versa-Tile 3D Editor</string>
   </property>
-  <widget class="QWidget" name="centralWidget">
+  <widget class="ModelEditorView" name="modelViewEditor">
    <property name="minimumSize">
     <size>
      <width>750</width>
@@ -521,6 +521,12 @@
    <class>TileSetViewer</class>
    <extends>QWidget</extends>
    <header location="global">tilesetviewer.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ModelEditorView</class>
+   <extends>QWidget</extends>
+   <header location="global">modeleditorview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

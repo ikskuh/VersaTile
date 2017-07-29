@@ -48,7 +48,8 @@ ModelEditorView::ModelEditorView(QWidget *parent) :
     mUndoStack(), mRedoStack(),
     mSelectedFace(-1),
     mCurrentTool(Select),
-    mHomePan(0.4f), mHomeTilt(-0.3f), mHomeZoom(128.0f)
+    mHomePan(0.4f), mHomeTilt(-0.3f), mHomeZoom(128.0f),
+    mGroundSize(1)
 {
 	QSurfaceFormat fmt;
 	fmt.setVersion(3, 3);
@@ -72,6 +73,7 @@ void ModelEditorView::loadSettings()
 
 	settings.beginGroup("display");
 	this->mGroundMode = settings.value("groundmode", 2).toInt();
+	this->mGroundSize = settings.value("groundsize", 10).toInt();
 	settings.endGroup();
 
 	this->update();
@@ -1115,9 +1117,13 @@ void ModelEditorView::paintGL()
 			break;
 
 		case 1: { // grid mode
-			int gridWidth = 10;
-			int gridHeight = 10;
+			int gridWidth = this->mGroundSize;
+			int gridHeight = this->mGroundSize;
 			float gridSize = this->mMesh.minimumTileSize;
+
+			if(gridWidth <= 0 || gridHeight <= 0) {
+				break;
+			}
 
 			glm::vec3 origin(0, 0, 0);
 			glm::vec3 tangent(1, 0, 0);
@@ -1159,11 +1165,13 @@ void ModelEditorView::paintGL()
 			glDepthMask(GL_TRUE);
 			this->mPixel->bind();
 
+			auto size = this->mMesh.minimumTileSize * this->mGroundSize;
+
 			vertices.clear();
-			vertices.emplace_back(glm::ivec3(-256, 0, -256));
-			vertices.emplace_back(glm::ivec3( 256, 0, -256));
-			vertices.emplace_back(glm::ivec3(-256, 0,  256));
-			vertices.emplace_back(glm::ivec3( 256, 0,  256));
+			vertices.emplace_back(glm::ivec3(-size, 0, -size));
+			vertices.emplace_back(glm::ivec3( size, 0, -size));
+			vertices.emplace_back(glm::ivec3(-size, 0,  size));
+			vertices.emplace_back(glm::ivec3( size, 0,  size));
 
 			glBindBuffer(GL_ARRAY_BUFFER, this->vbuffer);
 			glBufferData(

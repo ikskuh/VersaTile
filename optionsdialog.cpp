@@ -4,6 +4,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QSlider>
+#include <QSpinBox>
 
 OptionsDialog::OptionsDialog(QWidget *parent) :
     QDialog(parent),
@@ -19,6 +20,7 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
 
 	this->mSettings.beginGroup("display");
 	this->ui->cbGroundMode->setCurrentIndex(this->mSettings.value("groundmode", 2).toInt());
+	this->ui->sbGroundSize->setValue(this->mSettings.value("groundsize", 10).toInt());
 	this->mSettings.endGroup();
 }
 
@@ -36,5 +38,6 @@ void OptionsDialog::on_buttonBox_accepted()
 
 	this->mSettings.beginGroup("display");
 	this->mSettings.setValue("groundmode", this->ui->cbGroundMode->currentIndex());
+	this->mSettings.setValue("groundsize", this->ui->sbGroundSize->value());
 	this->mSettings.endGroup();
 }

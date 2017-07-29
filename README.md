@@ -135,3 +135,7 @@ Determines the way a ground plane is shown. When **None**, no ground plane is
 visible, **Grid** is a static horizontal grid, even when the vertical one
 is shown and **Solid** is a solid, green surface that is supposed to resemble
 a grassy ground.
+
+#### Ground Size
+The extends of the ground in tiles. The larger this is, the larger the ground
+will be displayed.

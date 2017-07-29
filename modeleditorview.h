@@ -214,7 +214,7 @@ private:
 
 	bool mAutoGrid;
 	float mAutoGridThreshold;
-	int mGroundMode;
+	int mGroundMode, mGroundSize;
 };
 
 #endif // MODELEDITORVIEW_H

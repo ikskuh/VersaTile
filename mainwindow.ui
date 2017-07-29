@@ -56,11 +56,14 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
     <addaction name="separator"/>
-    <addaction name="actionDelete_Face"/>
+    <addaction name="actionSelection_Mode"/>
+    <addaction name="separator"/>
     <addaction name="actionFlip_Horizontal"/>
     <addaction name="actionFlip_Vertical"/>
     <addaction name="actionRotateRight"/>
     <addaction name="actionRotateLeft"/>
+    <addaction name="separator"/>
+    <addaction name="actionDelete_Face"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -73,11 +76,6 @@
     <addaction name="separator"/>
     <addaction name="actionSet_Home"/>
    </widget>
-   <widget class="QMenu" name="menuMode">
-    <property name="title">
-     <string>Tool</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
      <string>Help</string>
@@ -88,7 +86,6 @@
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
-   <addaction name="menuMode"/>
    <addaction name="menu"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -187,6 +184,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionSelection_Mode"/>
+   <addaction name="separator"/>
    <addaction name="actionRotateLeft"/>
    <addaction name="actionRotateRight"/>
    <addaction name="separator"/>
@@ -475,6 +474,18 @@
    </property>
    <property name="toolTip">
     <string>Go to the GitHub page</string>
+   </property>
+  </action>
+  <action name="actionSelection_Mode">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/tool-select.png</normaloff>:/data/tool-select.png</iconset>
+   </property>
+   <property name="text">
+    <string>Selection Mode</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
    </property>
   </action>
  </widget>

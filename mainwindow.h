@@ -92,6 +92,8 @@ private slots:
 
 	void on_actionPreferences_triggered();
 
+	void on_actionSelection_Mode_triggered();
+
 public:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 

@@ -179,6 +179,8 @@ public:
 	void gotoCameraTop();
 	void gotoCameraSide();
 
+	void resetInsertMode();
+
 private:
 	void updateAutoGrid();
 	void selectNextGrid();

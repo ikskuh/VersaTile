@@ -465,3 +465,8 @@ void MainWindow::on_actionPreferences_triggered()
 	this->mve->loadSettings();
 	// this->tse->update();
 }
+
+void MainWindow::on_actionSelection_Mode_triggered()
+{
+    this->mve->resetInsertMode();
+}

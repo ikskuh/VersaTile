@@ -152,6 +152,15 @@ void ModelEditorView::getPlane(int index, glm::ivec3 & normal,glm::ivec3 & tange
 	}
 }
 
+void ModelEditorView::resetInsertMode()
+{
+	// Right button resets the tool to selection and unselect all
+	this->mCurrentTool = Select;
+	this->clearSelection();
+	this->selectionCleared();
+	this->repaint();
+}
+
 void ModelEditorView::keyPressEvent(QKeyEvent *event)
 {
 	glm::vec3 cameraDirection(sin(this->mPan), 0.0f, cos(this->mPan));
@@ -192,12 +201,6 @@ void ModelEditorView::keyPressEvent(QKeyEvent *event)
 			if(this->mAutoGrid == false) {
 				this->selectNextGrid();
 			}
-			break;
-		case Qt::Key_Space:
-			// Right button resets the tool to selection and unselect all
-			this->mCurrentTool = Select;
-			this->clearSelection();
-			this->selectionCleared();
 			break;
 		case Qt::Key_Shift:
 			this->mSnapToCoarseGrid = false;

@@ -140,3 +140,7 @@ a grassy ground.
 #### Ground Size
 The extends of the ground in tiles. The larger this is, the larger the ground
 will be displayed.
+
+## More Screenshots
+
+![](https://puu.sh/wXGND/2a17f8ef45.png)

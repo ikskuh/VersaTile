@@ -372,13 +372,15 @@ void MainWindow::on_actionExport_triggered()
 	int texIndex = 0;
 	aiString name("TilesetTexture");
 	aiColor3D diffuse(1.0f, 1.0f, 1.0f);
+	aiString texName("*0");
+	int btrue = 1;
 
 	aiMaterial * material = new aiMaterial;
 	material->AddProperty(&name, AI_MATKEY_NAME);
-	material->AddProperty(&texIndex, 1, AI_MATKEY_TEXTURE_DIFFUSE(0));
-	material->AddProperty(&texIndex, 1, AI_MATKEY_TEXTURE_AMBIENT(0));
+	material->AddProperty(&btrue, 1, AI_MATKEY_TWOSIDED);
+	material->AddProperty(&texName, AI_MATKEY_TEXTURE_DIFFUSE(0));
+	material->AddProperty(&texName, AI_MATKEY_TEXTURE_AMBIENT(0));
 	material->AddProperty(&diffuse, 1, AI_MATKEY_COLOR_DIFFUSE);
-	material->AddProperty(&diffuse, 1, AI_MATKEY_COLOR_AMBIENT);
 
 	aiMesh ** meshes =  new aiMesh*[1];
 	meshes[0] = mesh;
@@ -416,7 +418,7 @@ void MainWindow::on_actionExport_triggered()
 		scene,
 		exporter.GetExportFormatDescription(index)->id,
 		dialog.selectedFiles()[0].toStdString(),
-	    aiProcess_Triangulate,
+	    aiProcess_Triangulate | aiProcess_FlipUVs,
 		nullptr);
 }
 

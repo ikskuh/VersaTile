@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>100</height>
+    <height>285</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Tile Set</string>
+      <string>Tileset Image</string>
      </property>
     </widget>
    </item>
@@ -27,12 +27,12 @@
    <item row="1" column="0">
     <widget class="QLabel" name="minimumTileSizeLabel">
      <property name="text">
-      <string>Minimum Tile Size</string>
+      <string>Tile Size</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QSpinBox" name="minimumTileSizeSpinBox">
+    <widget class="QSpinBox" name="tileSize">
      <property name="suffix">
       <string> px</string>
      </property>
@@ -53,13 +53,73 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="6" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QSpinBox" name="tilesetMargin">
+     <property name="suffix">
+      <string> px</string>
+     </property>
+     <property name="maximum">
+      <number>1024</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Tileset Margin</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QSpinBox" name="tilePadding">
+     <property name="suffix">
+      <string> px</string>
+     </property>
+     <property name="maximum">
+      <number>1024</number>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Tile Padding</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QGraphicsView" name="preview">
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(132, 132, 132);</string>
+     </property>
+     <property name="backgroundBrush">
+      <brush brushstyle="NoBrush">
+       <color alpha="255">
+        <red>0</red>
+        <green>0</green>
+        <blue>0</blue>
+       </color>
+      </brush>
+     </property>
+     <property name="dragMode">
+      <enum>QGraphicsView::ScrollHandDrag</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Preview:</string>
      </property>
     </widget>
    </item>

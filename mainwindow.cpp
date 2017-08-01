@@ -19,6 +19,7 @@
 
 #include "createmodeldialog.h"
 #include "optionsdialog.h"
+#include "openspritesheetdialog.h"
 
 #include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
@@ -476,25 +477,45 @@ void MainWindow::on_actionFocus_Selection_triggered()
 
 void MainWindow::on_actionUpdate_texture_triggered()
 {
-	QString file = QFileDialog::getOpenFileName(
-		this,
-		"Select the tileset you want to use",
-		QString(),
-		"Image Files (*.png *.jpg *.bmp)");
-	if(file.isNull()) {
-		return;
-	}
-	QImage newTexture(file);
-	if(newTexture.isNull()) {
-		QMessageBox::warning(
-			this,
-			this->windowTitle(),
-			"Failed to open image file!");
-		return;
-	}
+	int currentSize = this->mve->mesh().minimumTileSize;
+	OpenSpritesheetDialog dialog(this);
+	dialog.setSpriteSize(currentSize);
+
+	bool accepted = false;
+	do {
+
+		if(dialog.exec() != QDialog::Accepted) {
+			return;
+		}
+
+		if(currentSize != dialog.spriteSize()) {
+			auto result = QMessageBox::question(
+				this,
+				this->windowTitle(),
+				tr("The current model has a sprite size of %1, but the imported spritesheet has %2.\n"
+			       "Do you really want to import the sprite sheet?").arg(currentSize).arg(dialog.spriteSize()),
+				QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel),
+				QMessageBox::Yes);
+			switch(result) {
+				case QMessageBox::Yes:
+					accepted = true;
+					break;
+				case QMessageBox::No: continue;
+				case QMessageBox::Cancel: return;
+				default: continue;
+			}
+		} else {
+			accepted = true;
+		}
+
+	} while(!accepted);
+
+	QImage texture = dialog.spriteSheet();
+	int spriteSize = dialog.spriteSize();
 
 	Mesh mesh(this->mve->mesh());
-	mesh.texture = newTexture;
+	mesh.texture = texture;
+	mesh.minimumTileSize = spriteSize;
 	this->mve->setMesh(mesh);
 	this->tse->setMesh(mesh);
 }

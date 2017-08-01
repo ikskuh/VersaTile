@@ -45,7 +45,8 @@ SOURCES += main.cpp\
     mesh.cpp \
     createmodeldialog.cpp \
     fileselectionedit.cpp \
-    optionsdialog.cpp
+    optionsdialog.cpp \
+    openspritesheetdialog.cpp
 
 HEADERS  += mainwindow.h \
     modeleditorview.h \
@@ -53,11 +54,13 @@ HEADERS  += mainwindow.h \
     mesh.h \
     createmodeldialog.h \
     fileselectionedit.h \
-    optionsdialog.h
+    optionsdialog.h \
+    openspritesheetdialog.h
 
 FORMS    += mainwindow.ui \
     createmodeldialog.ui \
-    optionsdialog.ui
+    optionsdialog.ui \
+    openspritesheetdialog.ui
 
 RESOURCES += \
     data.qrc

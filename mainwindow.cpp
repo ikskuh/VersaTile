@@ -398,32 +398,12 @@ void MainWindow::on_actionExport_triggered()
 	aiMaterial ** materials = new aiMaterial*[1];
 	materials[0] = material;
 
-	/*
-	aiTexture ** textures = new aiTexture*[1];
-	textures[0] = new aiTexture;
-	textures[0]->mWidth = src.texture.width();
-	textures[0]->mHeight = src.texture.height();
-	textures[0]->pcData = new aiTexel[src.texture.width() * src.texture.height()];
-	for(unsigned y = 0; y < textures[0]->mHeight; y++) {
-		for(unsigned x = 0; x < textures[0]->mWidth; x++) {
-			QRgb col = src.texture.pixel(x, y);
-			aiTexel & texel = textures[0]->pcData[textures[0]->mWidth * y + x];
-			texel.r = uint8_t(qRed(col));
-			texel.g = uint8_t(qGreen(col));
-			texel.b = uint8_t(qBlue(col));
-			texel.a = uint8_t(qAlpha(col));
-		}
-	}
-	memcpy(textures[0]->achFormatHint, "png", 4);
-	*/
-
 	aiScene * scene = new aiScene;
 	scene->mNumMeshes = 1;
 	scene->mNumMaterials = 1;
 	scene->mMeshes = meshes;
 	scene->mRootNode = node;
 	scene->mMaterials = materials;
-	// scene->mTextures = textures;
 
 	aiReturn result = exporter.Export(
 		scene,

@@ -43,8 +43,6 @@ SOURCES += main.cpp\
     modeleditorview.cpp \
     tilesetviewer.cpp \
     mesh.cpp \
-    createmodeldialog.cpp \
-    fileselectionedit.cpp \
     optionsdialog.cpp \
     openspritesheetdialog.cpp
 
@@ -52,13 +50,10 @@ HEADERS  += mainwindow.h \
     modeleditorview.h \
     tilesetviewer.h \
     mesh.h \
-    createmodeldialog.h \
-    fileselectionedit.h \
     optionsdialog.h \
     openspritesheetdialog.h
 
 FORMS    += mainwindow.ui \
-    createmodeldialog.ui \
     optionsdialog.ui \
     openspritesheetdialog.ui
 

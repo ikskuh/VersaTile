@@ -97,15 +97,15 @@ void MainWindow::on_actionNew_triggered()
 	if(this->ensureModelIsSave() == false) {
 		return;
 	}
-
-	CreateModelDialog dialog(this);
+	OpenSpritesheetDialog dialog(this);
+	dialog.setSpriteSize(this->mve->mesh().minimumTileSize);
 	if(dialog.exec() != QDialog::Accepted) {
 		return;
 	}
 
 	Mesh mesh;
-	mesh.texture = dialog.getTileSet();
-	mesh.minimumTileSize = dialog.getMinimumTileSize();
+	mesh.texture = dialog.spriteSheet();
+	mesh.minimumTileSize = dialog.spriteSize();
 	this->setModel(mesh);
 }
 

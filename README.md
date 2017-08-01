@@ -1,4 +1,4 @@
-# Versa-Tile 3D Model Editor
+# VersaTile 3D Model Editor
 
 ![Screenshot](https://puu.sh/wJfE6/1dc735ea5f.png)
 
@@ -141,6 +141,17 @@ a grassy ground.
 The extends of the ground in tiles. The larger this is, the larger the ground
 will be displayed.
 
+## Credits
+
+Thanks for each [Crocotile3D](http://www.crocotile3d.com/) and [Sprytile](https://github.com/ChemiKhazi/Sprytile)
+for inspiring me to create VersaTile!
+
+Also thanks to [kenney.nl](http://kenney.nl/assets/roguelike-caves-dungeons) for delivering our default tile
+set! It suits this editor very much.
+
 ## More Screenshots
 
+![](https://puu.sh/wYFlX/6b0fa22731.png)
+
 ![](https://puu.sh/wXGND/2a17f8ef45.png)
+

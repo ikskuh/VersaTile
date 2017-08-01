@@ -29,6 +29,8 @@ public:
 
 	void setSpriteSize(int size);
 
+	static QImage renderImage(QImage const & src, int size, int padding = 0, int margin = 0);
+
 private slots:
 	void on_selectFile_clicked();
 

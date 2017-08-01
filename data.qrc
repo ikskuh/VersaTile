@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>data/tilesets/croco.png</file>
         <file>data/close.png</file>
         <file>data/new.png</file>
         <file>data/open.png</file>
@@ -30,5 +29,6 @@
         <file>data/focus.png</file>
         <file>data/import.png</file>
         <file>data/grid.png</file>
+        <file>data/tilesets/roguelike-caves.png</file>
     </qresource>
 </RCC>

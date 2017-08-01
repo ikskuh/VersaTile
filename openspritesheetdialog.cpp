@@ -27,27 +27,22 @@ void OpenSpritesheetDialog::checkOk()
 		->setEnabled(!this->mSpriteSheet.isNull() );
 }
 
-void OpenSpritesheetDialog::renderImage()
+QImage OpenSpritesheetDialog::renderImage(QImage const & src, int size, int padding, int margin)
 {
-	if(this->mSourceImage.isNull()) {
-		this->mSpriteSheet = QImage();
-		return;
+	if(src.isNull()) {
+		return src;
 	}
-	int margin = this->ui->spritesheetMargin->value();
-	int padding = this->ui->spritePadding->value();
-	int size = this->ui->spriteSize->value();
 
-	int numX = (this->mSourceImage.width() - 2 * margin) / (size + padding);
-	int numY = (this->mSourceImage.height() - 2 * margin) / (size + padding);
+	int numX = (src.width() - 2 * margin) / (size + padding);
+	int numY = (src.height() - 2 * margin) / (size + padding);
 
 	if(numX <= 0 || numY <= 0) {
-		this->mSpriteSheet = QImage();
-		return;
+		return QImage();
 	}
-	this->mSpriteSheet = QImage(numX * size, numY * size, this->mSourceImage.format());
-	this->mSpriteSheet.fill(qRgba(0, 0, 0, 0));
+	QImage dest(numX * size, numY * size, src.format());
+	dest.fill(qRgba(0, 0, 0, 0));
 	{
-		QPainter painter(&this->mSpriteSheet);
+		QPainter painter(&dest);
 		painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 		for(int y = 0; y < numY; y++)
 		{
@@ -55,7 +50,7 @@ void OpenSpritesheetDialog::renderImage()
 			{
 				painter.drawImage(
 					QRect(size * x, size * y, size, size),
-					this->mSourceImage,
+					src,
 					QRect(
 						margin + (size + padding) * x,
 						margin + (size + padding) * y,
@@ -64,6 +59,20 @@ void OpenSpritesheetDialog::renderImage()
 			}
 		}
 	}
+	return dest;
+}
+
+void OpenSpritesheetDialog::renderImage()
+{
+	int margin = this->ui->spritesheetMargin->value();
+	int padding = this->ui->spritePadding->value();
+	int size = this->ui->spriteSize->value();
+
+	this->mSpriteSheet = renderImage(
+		this->mSourceImage,
+		size,
+		padding,
+		margin);
 }
 
 OpenSpritesheetDialog::~OpenSpritesheetDialog()

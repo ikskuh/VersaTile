@@ -17,7 +17,6 @@
 #include <QRgb>
 #include <QKeyEvent>
 
-#include "createmodeldialog.h"
 #include "optionsdialog.h"
 #include "openspritesheetdialog.h"
 
@@ -46,7 +45,11 @@ MainWindow::MainWindow(QWidget *parent) :
 		this->tse, &TileSetViewer::resetSelection);
 
 	Mesh mesh;
-	mesh.texture = QImage(":/data/tilesets/croco.png");
+	mesh.texture = OpenSpritesheetDialog::renderImage(
+		QImage(":/data/tilesets/roguelike-caves.png"),
+		16,
+		1,
+		0);
 	mesh.minimumTileSize = 16;
 	this->setModel(mesh);
 }

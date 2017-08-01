@@ -60,7 +60,4 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     data.qrc
 
-DISTFILES += \
-	data/tilesets/requirements.txt
-
 include(gl3w/gl3w.pri);

@@ -332,6 +332,13 @@ void MainWindow::on_actionExport_triggered()
 		return;
 	}
 
+	QFileInfo fileInfo(dialog.selectedFiles()[0]);
+
+	QString textureName = fileInfo.absolutePath()
+	        + "/"
+	        + fileInfo.completeBaseName()
+	        + ".png";
+
 	this->mCurrentExportFilter = dialog.selectedNameFilter();
 	int index = filterNames.indexOf(dialog.selectedNameFilter());
 
@@ -373,10 +380,9 @@ void MainWindow::on_actionExport_triggered()
 	node->mTransformation = aiMatrix4x4();
 	node->mName = aiString("root");
 
-	int texIndex = 0;
 	aiString name("TilesetTexture");
 	aiColor3D diffuse(1.0f, 1.0f, 1.0f);
-	aiString texName("*0");
+	aiString texName(textureName.toUtf8().data());
 	int btrue = 1;
 
 	aiMaterial * material = new aiMaterial;
@@ -392,6 +398,7 @@ void MainWindow::on_actionExport_triggered()
 	aiMaterial ** materials = new aiMaterial*[1];
 	materials[0] = material;
 
+	/*
 	aiTexture ** textures = new aiTexture*[1];
 	textures[0] = new aiTexture;
 	textures[0]->mWidth = src.texture.width();
@@ -408,22 +415,29 @@ void MainWindow::on_actionExport_triggered()
 		}
 	}
 	memcpy(textures[0]->achFormatHint, "png", 4);
+	*/
 
 	aiScene * scene = new aiScene;
 	scene->mNumMeshes = 1;
 	scene->mNumMaterials = 1;
-	scene->mNumTextures = 1;
 	scene->mMeshes = meshes;
 	scene->mRootNode = node;
 	scene->mMaterials = materials;
-	scene->mTextures = textures;
+	// scene->mTextures = textures;
 
 	aiReturn result = exporter.Export(
 		scene,
 		exporter.GetExportFormatDescription(index)->id,
-		dialog.selectedFiles()[0].toStdString(),
+		fileInfo.absoluteFilePath().toStdString(),
 	    aiProcess_Triangulate | aiProcess_FlipUVs,
 		nullptr);
+
+	if(result == aiReturn_SUCCESS)
+	{
+		src.texture.save(
+			textureName,
+			"png");
+	}
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)

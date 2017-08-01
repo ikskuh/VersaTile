@@ -1,9 +1,8 @@
 #include "mainwindow.h"
 #include <QApplication>
-
 int main(int argc, char *argv[])
 {
-    QSurfaceFormat fmt;
+	QSurfaceFormat fmt;
     fmt.setVersion(3, 3);
     QSurfaceFormat::setDefaultFormat(fmt);
 

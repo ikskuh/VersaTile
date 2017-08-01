@@ -6,6 +6,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QDebug>
+#include <QGraphicsPixmapItem>
 
 OpenSpritesheetDialog::OpenSpritesheetDialog(QWidget *parent) :
     QDialog(parent),
@@ -99,8 +100,40 @@ void OpenSpritesheetDialog::updatePreview()
 	this->mScene->clear();
 	if(this->mSpriteSheet.isNull() == false)
 	{
-		this->mScene->setSceneRect(this->mSpriteSheet.rect());
-		this->mScene->addPixmap(QPixmap::fromImage(this->mSpriteSheet));
+		// this->mScene->setSceneRect(this->mSpriteSheet.rect());
+
+		int size = this->ui->spriteSize->value();
+		int numX = this->mSpriteSheet.width() / size;
+		int numY = this->mSpriteSheet.height() / size;
+
+		for(int y = 0; y < numY; y++) {
+			for(int x = 0; x < numX; x++) {
+				QGraphicsPixmapItem * pmap = this->mScene->addPixmap(
+					QPixmap::fromImage(
+						this->mSpriteSheet.copy(size * x, size * y, size, size)));
+				pmap->setPos(
+					1 + (size + 1) * x,
+					1 + (size + 1) * y);
+			}
+		}
+
+		for(int x = 0; x <= numX; x++) {
+			this->mScene->addLine(
+				(size + 1) * x,
+				0,
+				(size + 1) * x,
+				(size + 1) * numY,
+				QPen(QColor(255,0,2550)));
+		}
+
+		for(int y = 0; y <= numY; y++) {
+			this->mScene->addLine(
+				0,
+				(size + 1) * y,
+				(size + 1) * numX,
+				(size + 1) * y,
+				QPen(QColor(255,0,0)));
+		}
 	}
 	else
 	{

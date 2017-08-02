@@ -63,6 +63,10 @@ and Q downwards.
 
 For a quick rotation of the camera, all shortcuts listed in the table below.
 
+If the option `Automatic adjust grid orientation` is set, the displayed grid will align
+with the camera so always the most convenient grid is active. If this option is disabled,
+the active grid can be changed by pressing **G** or the **Toggle Grid Plane** button.
+
 ### Inserting a tile
 To insert a tile, select the sprite on the right side by clicking and dragging until
 the wanted portion is selected. Now a tile can be inserted in the 3D viewport on

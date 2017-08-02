@@ -30,5 +30,10 @@
         <file>data/import.png</file>
         <file>data/grid.png</file>
         <file>data/tilesets/roguelike-caves.png</file>
+        <file>data/camera-xy.png</file>
+        <file>data/camera-xz.png</file>
+        <file>data/camera-yz.png</file>
+        <file>data/tileset.png</file>
+        <file>data/web.png</file>
     </qresource>
 </RCC>

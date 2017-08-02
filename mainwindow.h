@@ -100,8 +100,7 @@ private slots:
 
 	void on_actionSwap_Grid_Plane_triggered();
 
-public:
-	virtual void keyPressEvent(QKeyEvent *event) override;
+    void on_actionHomepage_triggered();
 
 private:
 	Ui::MainWindow *ui;

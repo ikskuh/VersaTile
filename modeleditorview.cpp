@@ -340,19 +340,19 @@ void ModelEditorView::gotoCameraHome()
 
 void ModelEditorView::gotoCameraFront()
 {
-	this->animate(this->mPan, 0.0f, &ModelEditorView::setPan);
-	this->animate(this->mTilt, 0.0f, &ModelEditorView::setTilt);
+    this->animate(this->mPan, M_PI, &ModelEditorView::setPan);
+    this->animate(this->mTilt, 0.0f, &ModelEditorView::setTilt);
 }
 
 void ModelEditorView::gotoCameraTop()
 {
 	this->animate(this->mPan, 0.0f, &ModelEditorView::setPan);
-	this->animate(this->mTilt, -M_PI_2, &ModelEditorView::setTilt);
+    this->animate(this->mTilt, -M_PI_2, &ModelEditorView::setTilt);
 }
 
 void ModelEditorView::gotoCameraSide()
 {
-	this->animate(this->mPan, M_PI_2, &ModelEditorView::setPan);
+    this->animate(this->mPan, -M_PI_2, &ModelEditorView::setPan);
 	this->animate(this->mTilt, 0.0f, &ModelEditorView::setTilt);
 }
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Versa-Tile 3D Editor</string>
+   <string>VersaTile 3D Editor</string>
   </property>
   <widget class="ModelEditorView" name="modelViewEditor">
    <property name="minimumSize">
@@ -27,7 +27,7 @@
      <x>0</x>
      <y>0</y>
      <width>931</width>
-     <height>20</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -78,6 +78,7 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionHomepage"/>
     <addaction name="actionGitHub_Page"/>
     <addaction name="actionAbout"/>
    </widget>
@@ -104,8 +105,12 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidgetTileset">
+   <property name="windowIcon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/tileset.png</normaloff>:/data/tileset.png</iconset>
+   </property>
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -179,8 +184,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>160</width>
-          <height>386</height>
+          <width>156</width>
+          <height>411</height>
          </rect>
         </property>
        </widget>
@@ -234,6 +239,9 @@
    <property name="text">
     <string>&amp;New</string>
    </property>
+   <property name="toolTip">
+    <string>Create a new model</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
    </property>
@@ -245,6 +253,9 @@
    </property>
    <property name="text">
     <string>&amp;Open...</string>
+   </property>
+   <property name="toolTip">
+    <string>Open an existing model</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -266,6 +277,9 @@
    <property name="text">
     <string>Sa&amp;ve As...</string>
    </property>
+   <property name="toolTip">
+    <string>Save file as...</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
    </property>
@@ -276,7 +290,7 @@
      <normaloff>:/data/settings.png</normaloff>:/data/settings.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Preferences</string>
+    <string>&amp;Preferences...</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -334,31 +348,55 @@
   </action>
   <action name="actionSet_Home">
    <property name="text">
-    <string>S&amp;et Home</string>
+    <string>Set Home</string>
+   </property>
+   <property name="toolTip">
+    <string>Set camera home</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+H</string>
    </property>
   </action>
   <action name="actionTop">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/camera-xz.png</normaloff>:/data/camera-xz.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Top</string>
+   </property>
+   <property name="toolTip">
+    <string>View from top</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
    </property>
   </action>
   <action name="actionSide">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/camera-yz.png</normaloff>:/data/camera-yz.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Side</string>
+   </property>
+   <property name="toolTip">
+    <string>View from the side</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>
    </property>
   </action>
   <action name="actionFront">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/camera-xy.png</normaloff>:/data/camera-xy.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Front</string>
+   </property>
+   <property name="toolTip">
+    <string>View from the front</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
@@ -370,7 +408,10 @@
      <normaloff>:/data/rotate-left.png</normaloff>:/data/rotate-left.png</iconset>
    </property>
    <property name="text">
-    <string>Rotate &amp;Left</string>
+    <string>Rotate &amp;left</string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate left</string>
    </property>
    <property name="shortcut">
     <string>Shift+R</string>
@@ -394,10 +435,10 @@
      <normaloff>:/data/rotate-right.png</normaloff>:/data/rotate-right.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Rotate Right</string>
+    <string>&amp;Rotate right</string>
    </property>
    <property name="toolTip">
-    <string>Rotate Right</string>
+    <string>Rotate right</string>
    </property>
    <property name="shortcut">
     <string>R</string>
@@ -409,10 +450,10 @@
      <normaloff>:/data/flip-horizontal.png</normaloff>:/data/flip-horizontal.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Flip Horizontal</string>
+    <string>&amp;Flip horizontal</string>
    </property>
    <property name="toolTip">
-    <string>Flip Horizontal</string>
+    <string>Flip horizontal</string>
    </property>
    <property name="shortcut">
     <string>H</string>
@@ -424,10 +465,10 @@
      <normaloff>:/data/flip-vertical.png</normaloff>:/data/flip-vertical.png</iconset>
    </property>
    <property name="text">
-    <string>Flip &amp;Vertical</string>
+    <string>Flip &amp;vertical</string>
    </property>
    <property name="toolTip">
-    <string>Flip Vertical</string>
+    <string>Flip vertical</string>
    </property>
    <property name="shortcut">
     <string>V</string>
@@ -439,10 +480,10 @@
      <normaloff>:/data/delete.png</normaloff>:/data/delete.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Delete Face</string>
+    <string>&amp;Delete tile</string>
    </property>
    <property name="toolTip">
-    <string>Delete Selected Face</string>
+    <string>Deletes the selected tile</string>
    </property>
    <property name="shortcut">
     <string>Del</string>
@@ -499,7 +540,10 @@
      <normaloff>:/data/tool-select.png</normaloff>:/data/tool-select.png</iconset>
    </property>
    <property name="text">
-    <string>Selection Mode</string>
+    <string>Selection mode</string>
+   </property>
+   <property name="toolTip">
+    <string>Selection mode</string>
    </property>
    <property name="shortcut">
     <string>Space</string>
@@ -513,6 +557,9 @@
    <property name="text">
     <string>Focus Selection</string>
    </property>
+   <property name="toolTip">
+    <string>Focus selection</string>
+   </property>
    <property name="shortcut">
     <string>F</string>
    </property>
@@ -523,7 +570,7 @@
      <normaloff>:/data/import.png</normaloff>:/data/import.png</iconset>
    </property>
    <property name="text">
-    <string>Update texture</string>
+    <string>Update texture...</string>
    </property>
    <property name="toolTip">
     <string>Updates the texture</string>
@@ -535,13 +582,22 @@
      <normaloff>:/data/grid.png</normaloff>:/data/grid.png</iconset>
    </property>
    <property name="text">
-    <string>Swap Grid Plane</string>
+    <string>Swap grid plane</string>
    </property>
    <property name="toolTip">
     <string>Swaps the currently active grid</string>
    </property>
    <property name="shortcut">
     <string>G</string>
+   </property>
+  </action>
+  <action name="actionHomepage">
+   <property name="icon">
+    <iconset resource="data.qrc">
+     <normaloff>:/data/web.png</normaloff>:/data/web.png</iconset>
+   </property>
+   <property name="text">
+    <string>Homepage...</string>
    </property>
   </action>
  </widget>

@@ -420,11 +420,6 @@ void MainWindow::on_actionExport_triggered()
 	}
 }
 
-void MainWindow::keyPressEvent(QKeyEvent *event)
-{
-	qDebug() << "fancy" << event->key();
-}
-
 void MainWindow::on_actionHome_triggered()
 {
     this->mve->gotoCameraHome();
@@ -520,4 +515,9 @@ void MainWindow::on_actionUpdate_texture_triggered()
 void MainWindow::on_actionSwap_Grid_Plane_triggered()
 {
     this->mve->selectNextGrid();
+}
+
+void MainWindow::on_actionHomepage_triggered()
+{
+    QDesktopServices::openUrl(QUrl("https://mq32.de/projects/versatile.htm"));
 }

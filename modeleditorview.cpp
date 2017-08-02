@@ -1196,6 +1196,10 @@ void ModelEditorView::paintGL()
 		case 2: // plane mode
 			// Render a ground plane
 			glDepthMask(GL_TRUE);
+
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonOffset(1.0, 1.0);
+
 			this->mPixel->bind();
 
 			auto size = this->mMesh.minimumTileSize * this->mGroundSize;
@@ -1219,6 +1223,8 @@ void ModelEditorView::paintGL()
 
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
 
+			glDisable(GL_POLYGON_OFFSET_FILL);
+
 			break;
 	}
 
@@ -1227,6 +1233,8 @@ void ModelEditorView::paintGL()
 		glDepthMask(GL_TRUE);
 		glDepthFunc(GL_LESS);
 
+		glEnable(GL_POLYGON_OFFSET_LINE);
+		glPolygonOffset(-1.0, -1.0);
 
 		this->mPixel->bind();
 
@@ -1323,6 +1331,8 @@ void ModelEditorView::paintGL()
 
 		glLineWidth(1.0f);
 		glDrawArrays(GL_LINES, 0, vertices.size());
+
+		glDisable(GL_POLYGON_OFFSET_LINE);
 	}
 
 

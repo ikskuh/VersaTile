@@ -1,0 +1,309 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8" >
+	<title>VersaTile 3D Manual</title>
+	<link rel="stylesheet" type="text/css" href="img/github-markdown.css">
+	<style type="text/css">
+		body {
+			max-width: 1024px;
+			margin-right: auto;
+			margin-left: auto;
+		}
+	</style>
+</head>
+<body class="markdown-body">
+
+<h1>VersaTile 3D Model Editor</h1>
+
+<p><img src="img/caves-01.png" alt="Screenshot"></p>
+
+<p><em>VersaTile</em> is a simple 3D model editor that allows
+editing models based on tilesets.</p>
+
+<p>Tiles can be placed on an axis-aligned plane and a
+model can be constructed this way.</p>
+
+<h2>Features</h2>
+
+<ul>
+<li>Model editing</li>
+<li>Undo/redo</li>
+<li>Vertex displacement</li>
+<li>Post-placement edit (move/rotate/mirror/displace/…)</li>
+<li>Export via Assimp</li>
+</ul>
+
+<h2>Usage</h2>
+
+<p>The editor is mainly controlled with the mouse. On the right hand side is a side bar
+that shows the models sprite sheet and allows the selection of sprites.</p>
+
+<p>The center of the editor contains a 3D viewport that shows the model and allows editing.</p>
+
+<h3>Creating a model</h3>
+
+<p>When creating a new model, the following dialog appears:</p>
+
+<p><img src="img/editor-01.png" alt="Create new model dialog"></p>
+
+<p>It provides several options that must be set up correctly to import a sprite sheet:</p>
+
+<ul>
+<li><strong>File Name</strong>
+This option is required and defines the file that should be used as the sprite sheet.</li>
+<li><strong>Sprite Size</strong>
+This option defines the size of the smallest tile that can be selected in the sprite
+sheet view. This also defines the grid size.</li>
+<li><strong>Spritesheet Margin</strong>
+If the sprite sheet image has a border around the contained sprites, set this value to
+the number of pixels this border is wide.</li>
+<li><strong>Sprite Padding</strong>
+If there is a padding between the single sprites in the sheet, set this value to the
+number of pixels this padding is wide.</li>
+<li><strong>Preview</strong>
+Here you can see a preview of the imported sprites. The magenta lines will disappear in
+the editor, but are displayed here for you to check if your setup of the sprite sheet
+is correct.</li>
+</ul>
+
+<h3>Navigating in the Viewport</h3>
+
+<p><img src="img/editor-generic.png" alt="Generic Controls"></p>
+
+<p><em>VersaTile</em> uses a grid aligned movement for the camera focus. This grid is shown
+as white lines and aligns itself to fit a comfortable insertion position.</p>
+
+<p>To rotate the camera, hold the <strong>right mouse button</strong> and drag. Horizontal movement
+rotates the camera around the focus point, vertical movement looks up and down.</p>
+
+<p>To move the focus point, press W,A,S,D,Q and E. W moves the camera forward horizontally,
+S moves it backwards. A moves to the left and B to the right. E moves the camera upwards
+and Q downwards.</p>
+
+<p>For a quick rotation of the camera, all shortcuts listed in the table below.</p>
+
+<p>If the option <code>Automatic adjust grid orientation</code> is set, the displayed grid will align
+with the camera so always the most convenient grid is active. If this option is disabled,
+the active grid can be changed by pressing <strong>G</strong> or the <strong>Toggle Grid Plane</strong> button.</p>
+
+<h3>Inserting a tile</h3>
+
+<p>To insert a tile, select the sprite on the right side by clicking and dragging until
+the wanted portion is selected. Now a tile can be inserted in the 3D viewport on
+the white grid.</p>
+
+<p>When inserting, the tile snaps to the grid unless the <strong>Shift</strong> key is pressed, then
+a pixel perfect insertion can be done.</p>
+
+<p>When a good position is chosen, a left click will insert the tile at the previewed
+position. Then, another tile can be inserted. To insert a different tile, just
+select another sprite in the right panel. To end tile insertion, press <strong>Space</strong> or
+use the <strong>Selection mode</strong> button in the toolbar.</p>
+
+<h3>Modifying an existing tile</h3>
+
+<p><img src="img/editor-modifying.png" alt="Modify Display"></p>
+
+<p>Tiles can be modified in different ways:</p>
+
+<h4>Translate / Move</h4>
+
+<p>Click and drag the tiles center gizmo to move the tile on its own placement
+plane. You can move the tile up,down,left and right.</p>
+
+<h4>Rotate Left / Right</h4>
+
+<p>Click the corresponding button in the toolbar or menu to rotate the tile around
+its upper left corner.</p>
+
+<h4>Flip Horizontal / Vertical</h4>
+
+<p>Click the corresponding button in the toolbar or menu to mirror the contents of 
+the tile.</p>
+
+<h4>Displace Vertex</h4>
+
+<p>This feature allows you to displace a vertex to the tiles own plane. Click and
+drag a vertex gizmo to displace it along the tiles normal.</p>
+
+<p>This can be used to achieve slopes and skewed tiles.</p>
+
+<h4>Delete</h4>
+
+<p>Click the button on the toolbar or press <strong>Delete</strong> to remove the tile from the
+model.</p>
+
+<h2>Controls</h2>
+
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Function</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>W,A,S,D</td>
+<td>Move camera focus horizontal</td>
+</tr>
+<tr>
+<td>Q,E</td>
+<td>Move camera focus up/down</td>
+</tr>
+<tr>
+<td>Space</td>
+<td>Cancel/Stop tile insertion</td>
+</tr>
+<tr>
+<td>H</td>
+<td>Flip horizontal</td>
+</tr>
+<tr>
+<td>V</td>
+<td>Flip vertical</td>
+</tr>
+<tr>
+<td>R,Ctrl+R</td>
+<td>Rotate tile</td>
+</tr>
+<tr>
+<td>Shift</td>
+<td>Enable fine grid snapping (pixel perfect)</td>
+</tr>
+<tr>
+<td>Num-2</td>
+<td>Rotate camera down 90°</td>
+</tr>
+<tr>
+<td>Num-8</td>
+<td>Rotate camera up 90°</td>
+</tr>
+<tr>
+<td>Num-4</td>
+<td>Rotate camera left 90°</td>
+</tr>
+<tr>
+<td>Num-6</td>
+<td>Rotate camera right 90°</td>
+</tr>
+<tr>
+<td>Num-Plus</td>
+<td>Zoom camera in</td>
+</tr>
+<tr>
+<td>Num-Minus</td>
+<td>Zoom camera out</td>
+</tr>
+<tr>
+<td>Right Mouse</td>
+<td>Drag to rotate camera</td>
+</tr>
+<tr>
+<td>Left Mouse</td>
+<td>Click to select, modify or insert tile</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>Remove the selected tile</td>
+</tr>
+<tr>
+<td>Ctrl+Z</td>
+<td>Undo the last modification</td>
+</tr>
+<tr>
+<td>Ctrl+Y</td>
+<td>Redo the last undone modification</td>
+</tr>
+<tr>
+<td>Ctrl+H</td>
+<td>Rotate camera into <strong>Home</strong> position</td>
+</tr>
+<tr>
+<td>Ctrl+T</td>
+<td>Rotate camera into <strong>Top</strong> position</td>
+</tr>
+<tr>
+<td>Ctrl+F</td>
+<td>Rotate camera into <strong>Front</strong> position</td>
+</tr>
+<tr>
+<td>Ctrl+G</td>
+<td>Rotate camera into <strong>Side</strong> position</td>
+</tr>
+<tr>
+<td>Ctrl+Shift+H</td>
+<td>Set camera home position</td>
+</tr>
+<tr>
+<td>G</td>
+<td>When AutoGrid is disabled, selects the next grid option</td>
+</tr>
+<tr>
+<td>F</td>
+<td>Moves the camera center to the currently selected tile.</td>
+</tr>
+</tbody></table>
+
+<h2>Supported Export Formats</h2>
+
+<p><em>VersaTile</em> supports exporting the created 3D models with <a href="http://assimp.sourceforge.net/">Assimp</a>.
+Every format that can be exported by Assimp can also be used with <em>VersaTile</em>.</p>
+
+<p>On export, the <strong>Y-axis</strong> is <strong>up</strong> and the model is scaled in a way that a single
+texture pixel is equivalent to one model unit.</p>
+
+<p>So a model that is 64 pixels wide is also 64 units wide.</p>
+
+<h2>Preferences</h2>
+
+<p>In this dialog, you can set up your preferences on how <em>VeraTile</em> should behave.</p>
+
+<h3>Behaviour</h3>
+
+<p><img src="img/editor-03.png" alt="Preferences dialog: Behaviour"></p>
+
+<h4>Automatic adjust grid orientation</h4>
+
+<p>When this option is active, the grid will align itself with the camera
+as soon as it is moved.</p>
+
+<h4>Horizontal Grid Threshold</h4>
+
+<p>This is a factor from <code>0.0</code>…<code>1.0</code> that scales the <strong>y axis</strong> when determining
+the current auto grid.</p>
+
+<p>The lower this is, the later the grid will align into &quot;horizontal&quot; mode,
+allowing more camera movement before swapping into horizontal mode.</p>
+
+<h3>Display</h3>
+
+<p><img src="img/editor-02.png" alt="Preferences dialog: Display"></p>
+
+<h4>Ground Display</h4>
+
+<p>Determines the way a ground plane is shown. When <strong>None</strong>, no ground plane is
+visible, <strong>Grid</strong> is a static horizontal grid, even when the vertical one
+is shown and <strong>Solid</strong> is a solid, green surface that is supposed to resemble
+a grassy ground.</p>
+
+<h4>Ground Size</h4>
+
+<p>The extends of the ground in tiles. The larger this is, the larger the ground
+will be displayed.</p>
+
+<h4>Show Coordinate Axis</h4>
+
+<p>If this option is enabled, the coordinate axis are shown by three short lines in the
+colors red (x-axis), green (y-axis) and blue (z-axis). The intersection of the three
+lines is the current camera focus point.</p>
+
+<h2>Credits</h2>
+
+<p>Thanks for each <a href="http://www.crocotile3d.com/">Crocotile3D</a> and <a href="https://github.com/ChemiKhazi/Sprytile">Sprytile</a>
+for inspiring me to create <em>VersaTile</em>!</p>
+
+<p>Also thanks to <a href="http://kenney.nl/assets/roguelike-caves-dungeons">kenney.nl</a> for delivering our default tile
+set! It suits this editor very much.</p>
+
+</body>
+</html>

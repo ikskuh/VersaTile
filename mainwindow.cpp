@@ -92,7 +92,7 @@ void MainWindow::on_actionSave_As_triggered()
 	if(this->mCurrentFile.suffix() != "v3m") {
 		this->mCurrentFile.setFile(this->mCurrentFile.filePath() + ".v3m");
 	}
-	this->save();
+	this->save();    
 }
 
 void MainWindow::on_actionNew_triggered()
@@ -110,6 +110,8 @@ void MainWindow::on_actionNew_triggered()
 	mesh.texture = dialog.spriteSheet();
 	mesh.minimumTileSize = dialog.spriteSize();
 	this->setModel(mesh);
+    this->mModelIsDirty = false;
+    updateTitle();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -168,7 +170,7 @@ void MainWindow::on_actionOpen_triggered()
 
 	this->setModel(mesh);
 	this->mCurrentFile.setFile(fileName);
-
+    updateTitle();
 }
 
 void MainWindow::on_mve_modelHasChanged()
@@ -177,6 +179,7 @@ void MainWindow::on_mve_modelHasChanged()
 		qDebug() << "Mark model as dirty...";
 	}
 	this->mModelIsDirty = true;
+    updateTitle();
 }
 
 bool MainWindow::ensureModelIsSave()
@@ -221,6 +224,7 @@ void MainWindow::save()
 	file.close();
 
 	this->mModelIsDirty = false;
+    updateTitle();
 }
 
 void MainWindow::setModel(const Mesh & mesh)
@@ -229,6 +233,25 @@ void MainWindow::setModel(const Mesh & mesh)
 	this->mve->setMesh(mesh);
 	this->tse->setMesh(mesh);
 	this->mModelIsDirty = false;
+    updateTitle();
+}
+
+void MainWindow::updateTitle()
+{
+    QString title;
+
+    if(mCurrentFile.exists()) {
+        title += mCurrentFile.fileName();
+        if(mModelIsDirty == true) {
+            title += "* - ";
+        }
+        else {
+            title += " - ";
+        }
+    }
+
+    title += "VersaTile 3D Editor";
+    this->setWindowTitle(title);
 }
 
 void MainWindow::on_actionRotateRight_triggered()

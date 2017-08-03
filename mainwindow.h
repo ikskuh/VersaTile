@@ -37,6 +37,8 @@ private:
 	 */
 	void setModel(const Mesh & mesh);
 
+    void updateTitle();
+
 	void on_mve_modelHasChanged();
 
 	virtual void closeEvent(QCloseEvent *event) override;

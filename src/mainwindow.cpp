@@ -320,6 +320,12 @@ static aiVector3D C(const Mesh & mesh, const glm::ivec3 & vec)
 	return aiVector3D(vec.x, vec.y, vec.z);
 }
 
+static aiVector3D C(const Mesh & mesh, const glm::vec3 & vec)
+{
+	Q_UNUSED(mesh);
+	return aiVector3D(vec.x, vec.y, vec.z);
+}
+
 static aiVector3D C(const Mesh &mesh, const glm::ivec2 &vec)
 {
 	return aiVector3D(
@@ -367,33 +373,62 @@ void MainWindow::on_actionExport_triggered()
 
 	const Mesh & src = this->mve->mesh();
 
+	std::vector<aiVector3D> positions;
+	std::vector<aiVector3D> normals;
+	std::vector<aiVector3D> uvcoords;
+
+	auto emitVertex = [&](Vertex const & vtx, glm::vec3 const & normal) -> size_t
+	{
+		size_t idx = positions.size();
+		positions.push_back(C(src, vtx.position));
+		normals.push_back(C(src, normal));
+		uvcoords.push_back(C(src, vtx.uv));
+		return idx;
+	};
+
 	aiMesh * mesh = new aiMesh;
-	mesh->mNumVertices = 4 * src.faces.size();
 	mesh->mPrimitiveTypes = aiPrimitiveType_TRIANGLE;
-	mesh->mVertices = new aiVector3D[4 * src.faces.size()];
-	mesh->mTextureCoords[0] = new aiVector3D[4 * src.faces.size()];
-	mesh->mNumUVComponents[0] = 2;
-	mesh->mFaces = new aiFace[src.faces.size()];
-	mesh->mNumFaces = src.faces.size();
+	mesh->mFaces = new aiFace[2 * src.faces.size()];
+	mesh->mNumFaces = 2 * src.faces.size();
 	mesh->mMaterialIndex = 0;
 
 	for(unsigned int i = 0; i < src.faces.size(); i++)
 	{
 		const Face & face = src.faces[i];
 
-		mesh->mFaces[i].mNumIndices = 4;
-		mesh->mFaces[i].mIndices = new unsigned int[4];
+		aiFace & dst0 = mesh->mFaces[2*i+0];
+		aiFace & dst1 = mesh->mFaces[2*i+1];
 
-		mesh->mFaces[i].mIndices[0] = 4 * i + 0;
-		mesh->mFaces[i].mIndices[1] = 4 * i + 1;
-		mesh->mFaces[i].mIndices[2] = 4 * i + 3;
-		mesh->mFaces[i].mIndices[3] = 4 * i + 2;
+		dst0.mNumIndices = 3;
+		dst0.mIndices = new unsigned int[3];
 
-		for(unsigned int o = 0; o < 4; o++) {
-			mesh->mVertices[4 * i + o] = C(src, face.vertices[o].position);
-			mesh->mTextureCoords[0][4 * i + o] = C(src, face.vertices[o].uv);
-		}
+		dst1.mNumIndices = 3;
+		dst1.mIndices = new unsigned int[3];
+
+		glm::vec3 n0 = glm::normalize(glm::cross(
+			glm::vec3(face.vertices[1].position - face.vertices[0].position),
+			glm::vec3(face.vertices[3].position - face.vertices[0].position)));
+		dst0.mIndices[0] = emitVertex(face.vertices[0], n0);
+		dst0.mIndices[1] = emitVertex(face.vertices[1], n0);
+		dst0.mIndices[2] = emitVertex(face.vertices[3], n0);
+
+		glm::vec3 n1 = glm::normalize(glm::cross(
+			glm::vec3(face.vertices[2].position - face.vertices[0].position),
+			glm::vec3(face.vertices[3].position - face.vertices[0].position)));
+		dst1.mIndices[0] = emitVertex(face.vertices[0], n1);
+		dst1.mIndices[1] = emitVertex(face.vertices[2], n1);
+		dst1.mIndices[2] = emitVertex(face.vertices[3], n1);
 	}
+
+	mesh->mNumVertices = positions.size();
+	mesh->mVertices = new aiVector3D[mesh->mNumVertices];
+	mesh->mNormals = new aiVector3D[mesh->mNumVertices];
+	mesh->mTextureCoords[0] = new aiVector3D[mesh->mNumVertices];
+	mesh->mNumUVComponents[0] = 2;
+
+	memcpy(mesh->mVertices, positions.data(), sizeof(aiVector3D) * mesh->mNumVertices);
+	memcpy(mesh->mNormals, normals.data(), sizeof(aiVector3D) * mesh->mNumVertices);
+	memcpy(mesh->mTextureCoords[0], uvcoords.data(), sizeof(aiVector3D) * mesh->mNumVertices);
 
 	unsigned int meshIndex = 0;
 

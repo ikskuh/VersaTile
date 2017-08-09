@@ -92,7 +92,7 @@ void MainWindow::on_actionSave_As_triggered()
 	if(this->mCurrentFile.suffix() != "v3m") {
 		this->mCurrentFile.setFile(this->mCurrentFile.filePath() + ".v3m");
 	}
-	this->save();    
+	this->save();
 }
 
 void MainWindow::on_actionNew_triggered()
@@ -323,8 +323,8 @@ static aiVector3D C(const Mesh & mesh, const glm::ivec3 & vec)
 static aiVector3D C(const Mesh &mesh, const glm::ivec2 &vec)
 {
 	return aiVector3D(
-		float(vec.x) / float(mesh.texture.width() - 1),
-		float(vec.y) / float(mesh.texture.height() - 1),
+		float(vec.x) / float(mesh.texture.width()),
+		float(vec.y) / float(mesh.texture.height()),
 		0.0f);
 }
 

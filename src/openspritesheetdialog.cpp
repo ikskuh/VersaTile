@@ -155,7 +155,7 @@ void OpenSpritesheetDialog::updatePreview()
 
 void OpenSpritesheetDialog::on_fileName_textChanged(const QString &fileName)
 {
-    this->mSourceImage = QImage(fileName);
+    this->mSourceImage = QImage(fileName).convertToFormat(QImage::Format_ARGB32);
 	if(this->mSourceImage.isNull() == false)
 	{
 		auto limit = qMin(

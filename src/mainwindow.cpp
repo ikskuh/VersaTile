@@ -20,6 +20,7 @@
 #include "optionsdialog.h"
 #include "openspritesheetdialog.h"
 
+#include <assimp/IOSystem.hpp>
 #include <assimp/Exporter.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>

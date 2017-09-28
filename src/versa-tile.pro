@@ -60,4 +60,4 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     data.qrc
 
-include(gl3w/gl3w.pri);
+include($$PWD/gl3w/gl3w.pri);

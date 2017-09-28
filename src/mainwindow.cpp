@@ -467,7 +467,7 @@ void MainWindow::on_actionExport_triggered()
 	aiReturn result = exporter.Export(
 		scene,
 		exporter.GetExportFormatDescription(index)->id,
-		fileInfo.absoluteFilePath().toStdString(),
+		fileInfo.absoluteFilePath().toStdString().c_str(),
 	    aiProcess_Triangulate | aiProcess_FlipUVs,
 		nullptr);
 

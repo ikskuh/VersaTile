@@ -3,6 +3,10 @@ dist: trusty
 language: cpp
 compiler: gcc
 
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libassimp-dev libglm-dev
+
 install:
   - wget https://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-linux-x64-5.9.1.run
   - chmod +x qt-opensource-linux-x64-5.9.1.run

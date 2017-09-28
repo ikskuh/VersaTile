@@ -16,13 +16,14 @@
 
 static void sysOpenGLDebug(GLenum,GLenum,GLuint,GLenum,GLsizei,const GLchar*,const void *);
 
-static QDebug operator<<(QDebug debug, const glm::vec3 &c)
+static inline QDebug operator<<(QDebug debug, const glm::vec3 &c)
 {
 	QDebugStateSaver saver(debug);
 	debug.nospace() << '(' << c.x << "; " << c.y << "; " << c.z << ')';
 	return debug;
 }
-static QDebug operator<<(QDebug debug, const glm::ivec3 &c)
+
+static inline QDebug operator<<(QDebug debug, const glm::ivec3 &c)
 {
 	QDebugStateSaver saver(debug);
 	debug.nospace() << '(' << c.x << "; " << c.y << "; " << c.z << ')';
@@ -437,7 +438,7 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				}
 
 				glm::ivec3 newCenter = this->raycastAgainstPlane(
-				    face->fulcrum, face->normal,
+				    glm::vec3(face->fulcrum), glm::vec3(face->normal),
 				    event->x(), event->y());
 
 				// Fixed: Fulcrum must snap to center, not newCenter!
@@ -466,7 +467,7 @@ void ModelEditorView::mouseMoveEvent(QMouseEvent *event)
 				}
 
 				glm::ivec3 movePos = this->raycastAgainstPlane(
-				    this->mMoveVertexOrigin, this->mMoveVertexPlaneNormal,
+				    glm::vec3(this->mMoveVertexOrigin), glm::vec3(this->mMoveVertexPlaneNormal),
 				    event->x(), event->y());
 
 				// Adjust into local space
@@ -524,7 +525,7 @@ void ModelEditorView::mousePressEvent(QMouseEvent *event)
 					if(i == 4) {
 
 						glm::ivec3 newCenter = this->raycastAgainstPlane(
-						    selection->fulcrum, selection->normal,
+						    glm::vec3(selection->fulcrum), glm::vec3(selection->normal),
 						    event->x(), event->y());
 
 						this->mMoveOffsetToCursor = newCenter - selection->fulcrum;
@@ -1167,11 +1168,11 @@ void ModelEditorView::paintGL()
 			{
 				for(int v = -gridHeight; v <= gridHeight; v++)
 				{
-					vertices.emplace_back(origin + gridSize * u * tangent + gridSize * v * cotangent);
-					vertices.emplace_back(origin + gridSize * u * tangent - gridSize * v * cotangent);
+					vertices.emplace_back(glm::ivec3(origin + gridSize * u * tangent + gridSize * v * cotangent));
+					vertices.emplace_back(glm::ivec3(origin + gridSize * u * tangent - gridSize * v * cotangent));
 
-					vertices.emplace_back(origin + gridSize * u * cotangent + gridSize * v * tangent);
-					vertices.emplace_back(origin + gridSize * u * cotangent - gridSize * v * tangent);
+					vertices.emplace_back(glm::ivec3(origin + gridSize * u * cotangent + gridSize * v * tangent));
+					vertices.emplace_back(glm::ivec3(origin + gridSize * u * cotangent - gridSize * v * tangent));
 				}
 			}
 

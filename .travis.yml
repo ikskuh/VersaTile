@@ -6,7 +6,7 @@ compiler: gcc
 install:
   - wget https://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-linux-x64-5.9.1.run
   - chmod +x qt-opensource-linux-x64-5.9.1.run
-  - ./qt-opensource-linux-x64-5.9.1.run
+  - ./qt-opensource-linux-x64-5.9.1.run --no-force-installations --verbose --script build/qt-installer.qs --platform minimal
   
 script:
   - mkdir build

@@ -1,5 +1,7 @@
 # VersaTile 3D Model Editor
 
+[![Build Status](https://travis-ci.org/MasterQ32/VersaTile.svg?branch=master)](https://travis-ci.org/MasterQ32/VersaTile)
+
 ![Screenshot](https://puu.sh/wZtBW/e4b61754c2.png)
 
 *VersaTile* is a simple 3D model editor that allows

@@ -6,12 +6,12 @@ compiler: gcc
 install:
   - wget https://download.qt.io/official_releases/qt/5.9/5.9.1/qt-opensource-linux-x64-5.9.1.run
   - chmod +x qt-opensource-linux-x64-5.9.1.run
-  - ./qt-opensource-linux-x64-5.9.1.run --no-force-installations --verbose --script build/qt-installer.qs --platform minimal
+  - ./qt-opensource-linux-x64-5.9.1.run --no-force-installations --script build/qt-installer.qs --platform minimal
   
 script:
   - export PATH="`pwd`/Qt/5.9.1/gcc_64/bin/:$PATH"
   - export LD_LIBRARY_PATH="`pwd`/Qt/5.9.1/gcc_64/lib/:$LD_LIBRARY_PATH"
   - cd build
-  - qmake -version
+  - ../Qt/5.9.1/gcc_64/bin/qmake -version
   - qmake ../src/versa-tile.pro
   - make -B

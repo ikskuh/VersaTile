@@ -468,8 +468,7 @@ void MainWindow::on_actionExport_triggered()
 		scene,
 		exporter.GetExportFormatDescription(index)->id,
 		fileInfo.absoluteFilePath().toStdString().c_str(),
-	    aiProcess_Triangulate | aiProcess_FlipUVs,
-		nullptr);
+	    aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	if(result == aiReturn_SUCCESS)
 	{

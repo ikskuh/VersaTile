@@ -59,18 +59,18 @@ bool Face::intersects(glm::vec3 origin, glm::vec3 direction, float * distance) c
     direction = glm::normalize(direction);
     // 0, 1, 3
     bool hit1 = triangle_intersection(
-        this->vertices[0].position,
-        this->vertices[1].position,
-        this->vertices[3].position,
+        glm::vec3(this->vertices[0].position),
+        glm::vec3(this->vertices[1].position),
+        glm::vec3(this->vertices[3].position),
         origin,
         direction,
         distance);
     if(hit1) return true;
     // 0, 2, 3
     return triangle_intersection(
-        this->vertices[0].position,
-        this->vertices[2].position,
-        this->vertices[3].position,
+        glm::vec3(this->vertices[0].position),
+        glm::vec3(this->vertices[2].position),
+        glm::vec3(this->vertices[3].position),
         origin,
         direction,
         distance);

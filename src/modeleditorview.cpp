@@ -1294,11 +1294,11 @@ void ModelEditorView::paintGL()
 			{
 				for(int v = -gridHeight; v <= gridHeight; v++)
 				{
-					vertices.emplace_back(origin + gridSize * u * tangent + gridSize * v * cotangent);
-					vertices.emplace_back(origin + gridSize * u * tangent - gridSize * v * cotangent);
+					vertices.emplace_back(glm::ivec3(origin + gridSize * u * tangent + gridSize * v * cotangent));
+					vertices.emplace_back(glm::ivec3(origin + gridSize * u * tangent - gridSize * v * cotangent));
 
-					vertices.emplace_back(origin + gridSize * u * cotangent + gridSize * v * tangent);
-					vertices.emplace_back(origin + gridSize * u * cotangent - gridSize * v * tangent);
+					vertices.emplace_back(glm::ivec3(origin + gridSize * u * cotangent + gridSize * v * tangent));
+					vertices.emplace_back(glm::ivec3(origin + gridSize * u * cotangent - gridSize * v * tangent));
 				}
 			}
 		}

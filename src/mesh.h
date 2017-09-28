@@ -10,6 +10,10 @@ struct Vertex
 {
     Vertex() : position(), uv() { }
 
+	Vertex(glm::vec3 vec) : position(vec), uv() { }
+
+    Vertex(glm::vec3 vec, glm::ivec2 uv) : position(vec), uv(uv) { }
+
     Vertex(glm::ivec3 vec) : position(vec), uv() { }
 
     Vertex(glm::ivec3 vec, glm::ivec2 uv) : position(vec), uv(uv) { }
